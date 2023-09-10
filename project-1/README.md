@@ -1,1 +1,1 @@
-# Project EX-1
+# Project 1
