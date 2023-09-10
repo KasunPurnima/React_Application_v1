@@ -1,16 +1,20 @@
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 // material-ui
 import {
+    Box,
     Button,
+    CircularProgress,
     Dialog,
     IconButton,
     OutlinedInput,
+    Snackbar,
     Stack,
     Tooltip
 } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 
 // project import
 import { PopupTransition } from 'components/@extended/Transitions';
@@ -67,6 +71,10 @@ function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ..
         />
     );
 }
+
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 // ==============================|| CurrencyPage ||============================== //
 
@@ -152,6 +160,29 @@ const CurrencyPage = () => {
         setOpenAlert(true)
     }
 
+    //snack bar
+    const [open, setOpen] = useState(false);
+    const [snackbarContent, setSnackbarContent] = useState({
+        severity: "",
+        description: ""
+    })
+
+    const handleClick = ({ severity, description }) => {
+        setSnackbarContent({
+            severity: severity,
+            description: description
+        })
+        setOpen(true);
+    };
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpen(false);
+    };
+
     // API calls
     const [loading, setLoading] = useState(false);
     const [totalDataCount, setTotalDataCount] = useState(0)
@@ -185,6 +216,10 @@ const CurrencyPage = () => {
             setTotalDataCount(response.data.pagination.total)
             setRows(mappedData);
         } catch (err) {
+            handleClick({
+                severity: "error",
+                description: err.response.data.description
+            })
             console.log(err);
         } finally {
             setLoading(false);
@@ -205,9 +240,17 @@ const CurrencyPage = () => {
                 }
             );
 
+            handleClick({
+                severity: "success",
+                description: "Create Currency Success"
+            })
             console.log("Create Currency Success");
             fetchData();
         } catch (err) {
+            handleClick({
+                severity: "error",
+                description: err.response.data.description
+            })
             console.log(err);
         } finally {
             setLoading(false);
@@ -228,9 +271,17 @@ const CurrencyPage = () => {
                 }
             );
 
+            handleClick({
+                severity: "success",
+                description: "Update Currency Success"
+            })
             console.log("Update Currency Success");
             fetchData();
         } catch (err) {
+            handleClick({
+                severity: "error",
+                description: err.response.data.description
+            })
             console.log(err);
         } finally {
             setLoading(false);
@@ -238,12 +289,8 @@ const CurrencyPage = () => {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return <>Loading...</>
-    }
+        fetchData({ search: globalFilter });
+    }, [globalFilter]);
 
     return (
         <>
@@ -256,28 +303,36 @@ const CurrencyPage = () => {
                         </Button>
                     </Stack>
                 </Stack>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pagination
-                    pageSize={10} // Set your desired page size
-                    rowCount={totalDataCount} // Replace with the actual total count from your API response
-                    onPageChange={(newPage) => {
-                        fetchData({ page: newPage + 1 }); // Add 1 to newPage to match your API's page numbering
-                    }}
-                    autoHeight
-                    autoWidth
-                    sx={{ mt: 3 }}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { page: 0, pageSize: 5 },
-                        },
-                    }}
-                    onPageSizeChange={(newPageSize) => {
-                        fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
-                    }}
-                    pageSizeOptions={[5, 10]}
-                />
+                {loading ? <>
+                    <Box
+                        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50vh' }}
+                    >
+                        <CircularProgress />
+                    </Box>
+                </> : <>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pagination
+                        pageSize={10} // Set your desired page size
+                        rowCount={totalDataCount} // Replace with the actual total count from your API response
+                        onPageChange={(newPage) => {
+                            fetchData({ page: newPage + 1 }); // Add 1 to newPage to match your API's page numbering
+                        }}
+                        autoHeight
+                        autoWidth
+                        sx={{ mt: 3 }}
+                        initialState={{
+                            pagination: {
+                                paginationModel: { page: 0, pageSize: 5 },
+                            },
+                        }}
+                        onPageSizeChange={(newPageSize) => {
+                            fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
+                        }}
+                        pageSizeOptions={[5, 10]}
+                    />
+                </>}
             </MainCard>
             {/* add / edit Currency dialog */}
             <Dialog
@@ -294,6 +349,16 @@ const CurrencyPage = () => {
             </Dialog>
             {/* alert model */}
             {currency && <AlertCurrencyDelete title={currency.currencyName || ""} open={openAlert} handleClose={handleAlertClose} updateCurrency={updateCurrency} currency={currency} />}
+            {/* snackbar model */}
+            {open && <>
+                <Snackbar
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    open={open} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity={snackbarContent.severity || "success"} sx={{ width: '100%' }}>
+                        {snackbarContent.description || ''}
+                    </Alert>
+                </Snackbar>
+            </>}
         </>
     )
 }
