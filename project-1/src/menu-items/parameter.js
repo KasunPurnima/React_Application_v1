@@ -17,6 +17,13 @@ const parameter = {
       url: '/parameter/currency-page',
       icon: icons.BankOutlined
     },
+    {
+      id: 'company',
+      title: 'Company',
+      type: 'item',
+      url: '/parameter/company-page',
+      icon: icons.BankOutlined
+    },
   ]
 };
 

@@ -12,6 +12,8 @@ const SamplePage = Loadable(lazy(() => import('pages/application/SamplePage')));
 
 // render - parameter
 const CurrencyPage = Loadable(lazy(() => import('pages/parameter/CurrencyPage')));
+const CompanyPage = Loadable(lazy(() => import('pages/parameter/company/CompanyPage')));
+
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -48,6 +50,10 @@ const MainRoutes = {
         {
           path: 'currency-page',
           element: <CurrencyPage />
+        },
+        {
+          path: 'company-page',
+          element: <CompanyPage />
         }
       ]
     },
