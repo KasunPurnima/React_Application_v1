@@ -1,7 +1,7 @@
 // assets
-import { BankOutlined } from '@ant-design/icons';
+import { BankOutlined, HourglassOutlined } from '@ant-design/icons';
 // icons
-const icons = { BankOutlined };
+const icons = { BankOutlined, HourglassOutlined };
 
 // ==============================|| MENU ITEMS - PARAMETER ||============================== //
 
@@ -22,7 +22,7 @@ const parameter = {
       title: 'Company',
       type: 'item',
       url: '/parameter/company-page',
-      icon: icons.BankOutlined
+      icon: icons.HourglassOutlined
     },
   ]
 };
