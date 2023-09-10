@@ -1,27 +1,27 @@
 # Project EX-1
 
-project 1 build referncing template project
+### project 1 build referncing template project
 
-Pre-requirties,
+#### Pre-requirties,
 
-node version - v16.16.0
+> node version - v16.16.0
 
-yarn version - 1.22.19
+> yarn version - 1.22.19
 
-To satrt the project, 
+#### To satrt the project, 
 
-Project-EX-1/proeject-1> yarn
+> Project-EX-1/proeject-1> yarn
 
-Project-EX-1/proeject-1> yarn start
+> Project-EX-1/proeject-1> yarn start
 
-Project 1 consist of
+### Project 1 consist of
 
-Currency List UI
+- Currency List UI
 
-Currency Create UI
+- Currency Create UI
 
-Currency Edit UI
+- Currency Edit UI
 
-Currency Delete UI
+- Currency Delete UI
 
-With CRUD Operation
+- With Fully Functionl CRUD Operation
