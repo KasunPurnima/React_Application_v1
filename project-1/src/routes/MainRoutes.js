@@ -11,7 +11,7 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 const SamplePage = Loadable(lazy(() => import('pages/application/SamplePage')));
 
 // render - parameter
-const CurrencyPage = Loadable(lazy(() => import('pages/parameter/CurrencyPage')));
+const CurrencyPage = Loadable(lazy(() => import('pages/parameter/currency/CurrencyPage')));
 const CompanyPage = Loadable(lazy(() => import('pages/parameter/company/CompanyPage')));
 
 

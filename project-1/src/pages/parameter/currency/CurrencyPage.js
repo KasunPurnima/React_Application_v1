@@ -39,10 +39,6 @@ import AddEditCurrency from './CurrencyCreateEdit';
  */
 //const
 const token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOeUhyZWpOc2p3UWZaNFdvbngwbzF1RkswQzVqNkFsUmlkSlR4VjNvN3E4In0.eyJleHAiOjE2OTQ0MzE3NTcsImlhdCI6MTY5NDM0NTM1NywianRpIjoiOTVjZTQzY2ItNjQ1YS00NDdiLTk2MjItNTI3ZGQ3ODc3NjQwIiwiaXNzIjoiaHR0cHM6Ly8xMC41NC4xLjg6ODQ0My9yZWFsbXMvRURDUyIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyNDI2NGZlYy00OTcxLTQwNmUtYmNjZi1lMWM0Y2U3OWE1YjciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjdXJsIiwic2Vzc2lvbl9zdGF0ZSI6ImVkZDZlNGY0LTRiYTctNDU3YS1iNGU3LTdhMDZmY2RmMmRjMCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZWRjcyJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6ImVkZDZlNGY0LTRiYTctNDU3YS1iNGU3LTdhMDZmY2RmMmRjMCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZ3JvdXBzIjpbInN1cGVyX2FkbWluIl0sInByZWZlcnJlZF91c2VybmFtZSI6ImVkY3NhZG1pbiJ9.GvuoTT8pzIinnw-Krb9ewwkXWo-t6jK8cGEJAa8KmP5i_EzRKFalS27JARL7f5qHjdJYH_El6K_xy_qQi6D85gn4w5zrEdRUi32KAmQLFuJwTx4ekkY9rxWiB5i_dYNJ4-rzgxZhECn1j96ek8uk2ujLp80CdO5fMb4Qe86eQ2x7MtfRRvF5MCJndRXMsQvGfM1rrFT8v3NYxF4w3YOKIwMDCFeWdhblNuPrJWphX3kGXgwVgtkjDo9LunmU7iL0B21HVsnvakjaOLFIEG_yN4tfFpAmqHCrMTOTIkzdSB_fYCPmp4_JKeVjlSOXucZGKLbGZZ4uKEjtBXjXUhLg3g"
-const rowsSample = [
-    { id: 1, currencyCode: 'LKR', currencyName: 'Sri Lankan Rupee', status: "Active" },
-    { id: 2, currencyCode: 'USD', currencyName: 'United States dollar', status: "Active" },
-];
 
 const currencyInit = {
     id: undefined,
@@ -90,7 +86,7 @@ const CurrencyPage = () => {
     const [JWTToken, setJWTToken] = useState(token || "")
 
     //table
-    const [rows, setRows] = useState(rowsSample || [])
+    const [rows, setRows] = useState([])
     const preGlobalFilteredRows = rows || [];
     const [globalFilter, setGlobalFilter] = useState("");
 
@@ -226,6 +222,13 @@ const CurrencyPage = () => {
             setTotalDataCount(response.data.pagination.total)
             setRows(mappedData);
         } catch (err) {
+            if (!err.response) {
+                handleClick({
+                    severity: "error",
+                    description: 'Something went wrong ...'
+                })
+                return;
+            }
             handleClick({
                 severity: "error",
                 description: err.response.data.description
@@ -315,7 +318,7 @@ const CurrencyPage = () => {
                             <Typography>JWT Token</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Grid continuer spacing={2}> 
+                            <Grid continuer spacing={2}>
                                 <Grid item md={12}>
                                     <TextField
                                         multiLine

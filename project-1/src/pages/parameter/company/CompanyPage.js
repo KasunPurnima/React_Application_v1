@@ -21,18 +21,6 @@ import MainCard from 'components/MainCard';
 // assets
 import { DeleteTwoTone, EditTwoTone, SearchOutlined } from '@ant-design/icons';
 
-/**
- * currencyTypeId
- * code 
- * name
- * isActive
- */
-//const 
-const rowsSample = [
-    { id: 1, groupId: 1, companyId: 'test-1', groupName: "test-1", status: "Active" },
-    { id: 2, groupId: 2, companyId: 'test-2', groupName: "test-2", status: "Active" },
-];
-
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
     const count = preGlobalFilteredRows.length;
@@ -70,7 +58,7 @@ const Alert = forwardRef(function Alert(props, ref) {
 
 const CompanyPage = () => {
     //table
-    const [rows, setRows] = useState(rowsSample || [])
+    const [rows, setRows] = useState([])
     const preGlobalFilteredRows = rows || [];
     const [globalFilter, setGlobalFilter] = useState("");
 
@@ -161,7 +149,6 @@ const CompanyPage = () => {
                     },
                 }
             );
-
             const mappedData = response.data.result.map((item, index) => ({
                 id: index,
                 ...item
@@ -170,6 +157,13 @@ const CompanyPage = () => {
             setTotalDataCount(response.data.pagination.total)
             setRows(mappedData);
         } catch (err) {
+            if (!err.response) {
+                handleClick({
+                    severity: "error",
+                    description: 'Something went wrong ...'
+                })
+                return;
+            }
             handleClick({
                 severity: "error",
                 description: err.response.data.description
