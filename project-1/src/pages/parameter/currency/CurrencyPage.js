@@ -365,7 +365,7 @@ const CurrencyPage = () => {
                                 sx={{ mt: 3 }}
                                 initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 5 },
+                                        paginationModel: { page: 0, pageSize: 10 },
                                     },
                                 }}
                                 onPageSizeChange={(newPageSize) => {
