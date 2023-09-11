@@ -12,7 +12,10 @@ const SamplePage = Loadable(lazy(() => import('pages/application/SamplePage')));
 
 // render - parameter
 const CurrencyPage = Loadable(lazy(() => import('pages/parameter/currency/CurrencyPage')));
-const CompanyPage = Loadable(lazy(() => import('pages/parameter/company/CompanyPage')));
+const ExistinggroupsnewPage = Loadable(lazy(() => import('pages/parameter/existinggroupsnew/ExistinggroupsnewPage')));
+const ExistinggroupsoldPage = Loadable(lazy(() => import('pages/parameter/existinggroupsold/ExistinggroupsoldPage')));
+const PaginationApiTestPage = Loadable(lazy(() => import('pages/parameter/paginationtest/PaginationApiTestPage')));
+
 
 
 
@@ -52,8 +55,16 @@ const MainRoutes = {
           element: <CurrencyPage />
         },
         {
-          path: 'company-page',
-          element: <CompanyPage />
+          path: 'get_existing-groups-new',
+          element: <ExistinggroupsnewPage />
+        },
+        {
+          path: 'get_existing-groups-old',
+          element: <ExistinggroupsoldPage />
+        },
+        {
+          path: 'get-pagiantion-api-test',
+          element: <PaginationApiTestPage />
         }
       ]
     },

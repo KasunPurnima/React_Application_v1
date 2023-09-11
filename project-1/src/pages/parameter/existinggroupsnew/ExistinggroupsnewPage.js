@@ -54,9 +54,9 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-// ==============================|| CompanyPage ||============================== //
+// ==============================|| ExistinggroupsnewPage ||============================== //
 
-const CompanyPage = () => {
+const ExistinggroupsnewPage = () => {
     //table
     const [rows, setRows] = useState([])
     const preGlobalFilteredRows = rows || [];
@@ -207,7 +207,7 @@ const CompanyPage = () => {
                                 sx={{ mt: 3 }}
                                 initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 5 },
+                                        paginationModel: { page: 0, pageSize: 10 },
                                     },
                                 }}
                                 onPageSizeChange={(newPageSize) => {
@@ -233,4 +233,4 @@ const CompanyPage = () => {
     )
 }
 
-export default CompanyPage;
+export default ExistinggroupsnewPage;
