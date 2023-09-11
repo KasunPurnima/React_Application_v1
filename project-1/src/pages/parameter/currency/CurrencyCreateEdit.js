@@ -32,7 +32,7 @@ const getInitialValues = (currency) => {
         currencyName: "",
     }
 
-    if (currency) { 
+    if (currency) {
         return _.merge({}, newCurrency, currency);
     }
 
@@ -43,7 +43,10 @@ const getInitialValues = (currency) => {
 
 const AddEditCurrency = ({ currency, onCancel, addCurrency, updateCurrency }) => {
     const CurrencySchema = Yup.object().shape({
-        currencyCode: Yup.string().required('Currency Code is required'),
+        currencyCode: Yup.string()
+            .required('Currency Code is required')
+            .min(3, 'Currency Code must be at least 3 characters')
+            .max(10, 'Currency Code cannot exceed 10 characters'),
         currencyName: Yup.string().required('Currency Name is required'),
     });
 

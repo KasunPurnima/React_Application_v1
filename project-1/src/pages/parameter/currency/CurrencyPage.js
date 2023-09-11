@@ -27,7 +27,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 import MainCard from 'components/MainCard';
 
 // assets
-import { CaretDownOutlined, DeleteTwoTone, EditTwoTone, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, DeleteTwoTone, EditTwoTone, PlusOutlined, RetweetOutlined, SearchOutlined } from '@ant-design/icons';
 import AlertCurrencyDelete from './AlertCurrencyDelete';
 import AddEditCurrency from './CurrencyCreateEdit';
 
@@ -38,7 +38,7 @@ import AddEditCurrency from './CurrencyCreateEdit';
  * isActive
  */
 //const
-const token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOeUhyZWpOc2p3UWZaNFdvbngwbzF1RkswQzVqNkFsUmlkSlR4VjNvN3E4In0.eyJleHAiOjE2OTQ0MzE3NTcsImlhdCI6MTY5NDM0NTM1NywianRpIjoiOTVjZTQzY2ItNjQ1YS00NDdiLTk2MjItNTI3ZGQ3ODc3NjQwIiwiaXNzIjoiaHR0cHM6Ly8xMC41NC4xLjg6ODQ0My9yZWFsbXMvRURDUyIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyNDI2NGZlYy00OTcxLTQwNmUtYmNjZi1lMWM0Y2U3OWE1YjciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjdXJsIiwic2Vzc2lvbl9zdGF0ZSI6ImVkZDZlNGY0LTRiYTctNDU3YS1iNGU3LTdhMDZmY2RmMmRjMCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZWRjcyJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6ImVkZDZlNGY0LTRiYTctNDU3YS1iNGU3LTdhMDZmY2RmMmRjMCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZ3JvdXBzIjpbInN1cGVyX2FkbWluIl0sInByZWZlcnJlZF91c2VybmFtZSI6ImVkY3NhZG1pbiJ9.GvuoTT8pzIinnw-Krb9ewwkXWo-t6jK8cGEJAa8KmP5i_EzRKFalS27JARL7f5qHjdJYH_El6K_xy_qQi6D85gn4w5zrEdRUi32KAmQLFuJwTx4ekkY9rxWiB5i_dYNJ4-rzgxZhECn1j96ek8uk2ujLp80CdO5fMb4Qe86eQ2x7MtfRRvF5MCJndRXMsQvGfM1rrFT8v3NYxF4w3YOKIwMDCFeWdhblNuPrJWphX3kGXgwVgtkjDo9LunmU7iL0B21HVsnvakjaOLFIEG_yN4tfFpAmqHCrMTOTIkzdSB_fYCPmp4_JKeVjlSOXucZGKLbGZZ4uKEjtBXjXUhLg3g"
+const token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOeUhyZWpOc2p3UWZaNFdvbngwbzF1RkswQzVqNkFsUmlkSlR4VjNvN3E4In0.eyJleHAiOjE2OTQ1Mjg2MzEsImlhdCI6MTY5NDQ0MjIzMSwianRpIjoiZTZlOGQyNjctZmY0Ni00MTExLThmYTAtZWY4ZDQxZTZjYmQxIiwiaXNzIjoiaHR0cHM6Ly8xMC41NC4xLjg6ODQ0My9yZWFsbXMvRURDUyIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyNDI2NGZlYy00OTcxLTQwNmUtYmNjZi1lMWM0Y2U3OWE1YjciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjdXJsIiwic2Vzc2lvbl9zdGF0ZSI6IjllNDJmMWZlLWJlOTQtNGE1OC1hMWIzLTdiNDkyOTM1MGFmNCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZWRjcyJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6IjllNDJmMWZlLWJlOTQtNGE1OC1hMWIzLTdiNDkyOTM1MGFmNCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZ3JvdXBzIjpbInN1cGVyX2FkbWluIl0sInByZWZlcnJlZF91c2VybmFtZSI6ImVkY3NhZG1pbiJ9.O6Y9gSX-OwK6XOqEFfB0eoekGwl96EdRy0TpN78Lm-_bxB-AV5GSkACZiERT7KCDnEjR3fO_3LnDdewv4f6QqGEqoiiPYMyfgh3BhT1OkhTjUoJt6YtzrtKvR59xBjwEDw_N0Z_XD3W83Oa4PxKNwtvJlbNgxn6WTTSw9QGRmM_rCybQxB2g7NTTwpEMLoXWsAJRnbBfN0LI0hw_o8URSLp5jo58gUdHMNqMavUTYmuTDmvLq8NxXNNwFO_YBiJ-XU7o5BOlqqxUY4ageJJSY3F7AV-Ea6b0KWlSY1chUJoJ414NB5T1AJRRsJ4FwzjORQXGwUTxF8KQ73a2AHjzfA"
 
 const currencyInit = {
     id: undefined,
@@ -192,10 +192,15 @@ const CurrencyPage = () => {
     // API calls
     const [loading, setLoading] = useState(false);
     const [totalDataCount, setTotalDataCount] = useState(0)
+    const [page, setpage] = useState(0)
+    const [perPage, setPerPage] = useState(10)
 
     const fetchData = async (queryParams = {}) => {
         try {
             setLoading(true);
+            setpage(queryParams.page || 0)
+            setPerPage(queryParams.per_page || 10)
+
             const response = await axios.get(
                 `https://edcsdev.informaticsint.com/api/v1/pettycash/reference/currencytype`,
                 {
@@ -204,6 +209,7 @@ const CurrencyPage = () => {
                         'Content-Type': 'application/json', // Adjust this header as needed
                     },
                     params: {
+                        page: queryParams.page || 0,
                         per_page: queryParams.per_page || 10,
                         sort: queryParams.sort || 'currencyTypeId',
                         direction: queryParams.direction || 'ASC',
@@ -318,8 +324,8 @@ const CurrencyPage = () => {
                             <Typography>JWT Token</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Grid continuer spacing={2}>
-                                <Grid item md={12}>
+                            <Grid container spacing={2}>
+                                <Grid item md={11}>
                                     <TextField
                                         multiLine
                                         rows={3}
@@ -329,6 +335,20 @@ const CurrencyPage = () => {
                                         value={JWTToken}
                                         onChange={(event) => setJWTToken(event.target.value)}
                                     />
+                                </Grid>
+                                <Grid item md={1}>
+                                    <Tooltip title="Edit">
+                                        <IconButton
+                                            color="primary"
+                                            onClick={(e) => {
+                                                fetchData()
+                                                e.stopPropagation();
+                                            }}
+                                            sx={{ alignSelf: "center" }}
+                                        >
+                                            <RetweetOutlined />
+                                        </IconButton>
+                                    </Tooltip>
                                 </Grid>
                             </Grid>
                         </AccordionDetails>
@@ -355,23 +375,21 @@ const CurrencyPage = () => {
                                 rows={rows}
                                 columns={columns}
                                 pagination
-                                pageSize={10} // Set your desired page size
-                                rowCount={totalDataCount} // Replace with the actual total count from your API response
-                                onPageChange={(newPage) => {
-                                    fetchData({ page: newPage + 1 }); // Add 1 to newPage to match your API's page numbering
-                                }}
+                                pageSize={perPage}  
+                                rowCount={totalDataCount}  
                                 autoHeight
                                 autoWidth
                                 sx={{ mt: 3 }}
                                 initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 10 },
+                                        paginationModel: { page: page, pageSize: perPage },
                                     },
                                 }}
-                                onPageSizeChange={(newPageSize) => {
-                                    fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
+                                onPaginationModelChange={(e) => {
+                                    console.log(e);
+                                    fetchData({ page: e.page, per_page: e.pageSize });
                                 }}
-                                pageSizeOptions={[5, 10]}
+                                pageSizeOptions={[5, 10, 20]}
                             />
                         </>}
                     </MainCard>
