@@ -7,11 +7,11 @@ import {
     Box,
     CircularProgress,
     Grid,
-    IconButton,
+    //IconButton,
     OutlinedInput,
     Snackbar,
     Stack,
-    Tooltip
+   // Tooltip
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 
@@ -19,7 +19,7 @@ import MuiAlert from '@mui/material/Alert';
 import MainCard from 'components/MainCard';
 
 // assets
-import { DeleteTwoTone, EditTwoTone, SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
@@ -64,45 +64,13 @@ const PaginationApiTestPage = () => {
 
     const columns = [
         // { field: 'id', headerName: 'ID', flex: 1 }, 
-        { field: 'workflowSelectionId', headerName: 'Group Id', flex: 1 },
-        { field: 'groupName', headerName: 'Group Name', flex: 1 },
-        { field: 'companyId', headerName: 'Company Id', flex: 1 },
-        { field: 'status', headerName: 'Status', flex: 1 },
-        {
-            field: 'actions',
-            headerName: 'Actions',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            renderCell: () => {
-                return (
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <Tooltip title="Edit">
-                            <IconButton
-                                color=""
-                                onClick={(e) => {
-                                    // handleEdit(params.row);
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <EditTwoTone />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                            <IconButton
-                                color="error"
-                                onClick={(e) => {
-                                    // handleDelete(params.row);
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <DeleteTwoTone />
-                            </IconButton>
-                        </Tooltip>
-                    </div>
-                );
-            },
-        },
+        { field: 'workflowSelectionId', headerName: 'Id', flex: 1 },
+        { field: 'approvalStatus', headerName: 'Data Row 1', flex: 1 },
+        { field: 'companyId', headerName: 'Data Row 2', flex: 1 },
+        { field: 'status', headerName: 'Data Row 3`', flex: 1 },
+        { field: 'type', headerName: 'Data Row 4`', flex: 1 },
+        { field: 'currentRequestDate', headerName: 'Data Row 5`', flex: 1 },
+        { field: 'account', headerName: 'Data Row 6`', flex: 1 },
     ];
 
     //snack bar

@@ -132,8 +132,8 @@ const ExistinggroupsoldPage = () => {
     const [loading, setLoading] = useState(false);
     const [totalDataCount, setTotalDataCount] = useState(0)
 
-   // const fetchData = async (queryParams = {}) => {
-    const fetchData = async () => {
+    const fetchData = async (queryParams = {}) => {
+   // const fetchData = async (page) => {
         try {
             setLoading(true);
             const response = await axios.get(
@@ -142,20 +142,16 @@ const ExistinggroupsoldPage = () => {
                     headers: {
                         'adminUserId': 'nble'
                     },
-                   /* params: {
-                        per_page: queryParams.per_page || 10,
-                        sort: queryParams.sort || 'groupId',
-                        direction: queryParams.direction || 'ASC',
-                        search: queryParams.search || '',
-                    },*/
+                    params: {
+                        per_page: queryParams.per_page || '',    
+                    },
                 }
             );
             const mappedData = response.data.groupDTO.map((item, index) => ({
                 id: index,
                 ...item
             }));
-
-            setTotalDataCount(response.data.pagination.total)
+            setTotalDataCount(response.totalDataCount)
             setRows(mappedData);
         } catch (err) {
             if (!err.response) {
@@ -208,7 +204,7 @@ const ExistinggroupsoldPage = () => {
                                 sx={{ mt: 3 }}
                                 initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 5 },
+                                        paginationModel: { page: 0, pageSize: 10 },
                                     },
                                 }}
                                 onPageSizeChange={(newPageSize) => {
