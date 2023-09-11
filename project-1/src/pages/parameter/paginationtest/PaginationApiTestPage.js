@@ -162,7 +162,7 @@ const PaginationApiTestPage = () => {
                                 <CircularProgress />
                             </Box>
                         </> : <>
-                            <DataGrid
+                        <DataGrid
                                 rows={rows}
                                 columns={columns}
                                 pagination
@@ -183,6 +183,7 @@ const PaginationApiTestPage = () => {
                                     fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
                                 }}
                                 pageSizeOptions={[5, 10]}
+                                paginationMode='server'
                             />
                         </>}
                     </MainCard>

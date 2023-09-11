@@ -90,6 +90,11 @@ const CurrencyPage = () => {
     const preGlobalFilteredRows = rows || [];
     const [globalFilter, setGlobalFilter] = useState("");
 
+
+    useEffect(() => {
+        console.log("rows  updated ", rows);
+    }, [rows])
+
     const columns = [
         // { field: 'id', headerName: 'ID', flex: 1 },
         { field: 'currencyCode', headerName: 'Currency Code', flex: 1 },
@@ -193,7 +198,7 @@ const CurrencyPage = () => {
     const [loading, setLoading] = useState(false);
     const [totalDataCount, setTotalDataCount] = useState(0)
     const [page, setpage] = useState(0)
-    const [perPage, setPerPage] = useState(10)
+    const [perPage, setPerPage] = useState(100)
 
     const fetchData = async (queryParams = {}) => {
         try {
@@ -202,7 +207,7 @@ const CurrencyPage = () => {
             setPerPage(queryParams.per_page || 10)
 
             const response = await axios.get(
-                `https://edcsdev.informaticsint.com/api/v1/pettycash/reference/currencytype`,
+                `http://10.30.2.111:9081/workflow2/reference/currencytype`,
                 {
                     headers: {
                         'Authorization': `Bearer ${JWTToken}`, // Replace with your actual token
@@ -217,6 +222,8 @@ const CurrencyPage = () => {
                     },
                 }
             );
+
+            console.log(response);
 
             const mappedData = response.data.result.map((item) => ({
                 id: item.currencyTypeId, // Map currencyTypeId to id
@@ -249,7 +256,7 @@ const CurrencyPage = () => {
         try {
             setLoading(true);
             await axios.post(
-                'https://edcsdev.informaticsint.com/api/v1/pettycash/reference/currencytype',
+                'http://10.30.2.111:9081/workflow2/reference/currencytype',
                 newCurrency,
                 {
                     headers: {
@@ -280,7 +287,7 @@ const CurrencyPage = () => {
         try {
             setLoading(true);
             await axios.put(
-                `https://edcsdev.informaticsint.com/api/v1/pettycash/reference/currencytype/${updatedCurrency.currencyTypeId}`,
+                `http://10.30.2.111:9081/workflow2/reference/currencytype/${updatedCurrency.currencyTypeId}`,
                 updatedCurrency,
                 {
                     headers: {
@@ -375,8 +382,8 @@ const CurrencyPage = () => {
                                 rows={rows}
                                 columns={columns}
                                 pagination
-                                pageSize={perPage}  
-                                rowCount={totalDataCount}  
+                                pageSize={perPage}
+                                rowCount={totalDataCount}
                                 autoHeight
                                 autoWidth
                                 sx={{ mt: 3 }}
@@ -390,6 +397,7 @@ const CurrencyPage = () => {
                                     fetchData({ page: e.page, per_page: e.pageSize });
                                 }}
                                 pageSizeOptions={[5, 10, 20]}
+                                paginationMode='server'
                             />
                         </>}
                     </MainCard>

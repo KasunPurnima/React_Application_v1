@@ -214,6 +214,7 @@ const ExistinggroupsnewPage = () => {
                                     fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
                                 }}
                                 pageSizeOptions={[5, 10]}
+                                paginationMode='server'
                             />
                         </>}
                     </MainCard>
