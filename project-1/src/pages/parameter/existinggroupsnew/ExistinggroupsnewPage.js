@@ -146,6 +146,7 @@ const ExistinggroupsnewPage = () => {
                         'adminUserId': 'nble'
                     },
                     params: {
+                        page: queryParams.page || 0,
                         per_page: queryParams.per_page || 10,
                         sort: queryParams.sort || 'groupId',
                         direction: queryParams.direction || 'ASC',

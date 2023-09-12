@@ -99,11 +99,15 @@ const PaginationApiTestPage = () => {
     // API calls
     const [loading, setLoading] = useState(false);
     const [totalDataCount, setTotalDataCount] = useState(0)
+    const [page, setpage] = useState(0)
+    const [perPage, setPerPage] = useState(100)
 
    const fetchData = async (queryParams = {}) => {
    // const fetchData = async () => {
         try {
             setLoading(true);
+            setpage(queryParams.page || 0)
+            setPerPage(queryParams.per_page || 10)
             const response = await axios.get(
                 `http://10.30.2.111:9081/workflow2/v3/v4/existing/client`,
                 {
@@ -111,6 +115,7 @@ const PaginationApiTestPage = () => {
                         'adminUserId': 'nble'
                     },
                     params: {
+                        page: queryParams.page || 0,
                         per_page: queryParams.per_page || 10,
                         sort: queryParams.sort || 'workflowSelectionId',
                         direction: queryParams.direction || 'ASC',
@@ -161,28 +166,26 @@ const PaginationApiTestPage = () => {
                             >
                                 <CircularProgress />
                             </Box>
-                        </> : <>
-                        <DataGrid
+                            </> : <>
+                            <DataGrid
                                 rows={rows}
                                 columns={columns}
                                 pagination
-                                pageSize={10} // Set your desired page size
-                                rowCount={totalDataCount} // Replace with the actual total count from your API response
-                                onPageChange={(newPage) => {
-                                    fetchData({ page: newPage + 1 }); // Add 1 to newPage to match your API's page numbering
-                                }}
+                                pageSize={perPage}
+                                rowCount={totalDataCount}
                                 autoHeight
                                 autoWidth
                                 sx={{ mt: 3 }}
                                 initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 10 },
+                                        paginationModel: { page: page, pageSize: perPage },
                                     },
                                 }}
-                                onPageSizeChange={(newPageSize) => {
-                                    fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
+                                onPaginationModelChange={(e) => {
+                                    console.log(e);
+                                    fetchData({ page: e.page, per_page: e.pageSize });
                                 }}
-                                pageSizeOptions={[5, 10]}
+                                pageSizeOptions={[5, 10, 20]}
                                 paginationMode='server'
                             />
                         </>}
