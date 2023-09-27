@@ -7,11 +7,12 @@ import {
     Box,
     CircularProgress,
     Grid,
+    Button,
     //IconButton,
     OutlinedInput,
     Snackbar,
     Stack,
-   // Tooltip
+    // Tooltip
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 
@@ -19,7 +20,7 @@ import MuiAlert from '@mui/material/Alert';
 import MainCard from 'components/MainCard';
 
 // assets
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
@@ -102,8 +103,8 @@ const PaginationApiTestPage = () => {
     const [page, setpage] = useState(0)
     const [perPage, setPerPage] = useState(100)
 
-   const fetchData = async (queryParams = {}) => {
-   // const fetchData = async () => {
+    const fetchData = async (queryParams = {}) => {
+        // const fetchData = async () => {
         try {
             setLoading(true);
             setpage(queryParams.page || 0)
@@ -159,6 +160,11 @@ const PaginationApiTestPage = () => {
                     <MainCard>
                         <Stack direction="row" spacing={2} justifyContent="space-between"  >
                             <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+
+                            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAddEdit}>
+                                Add New Currency
+                            </Button>
+
                         </Stack>
                         {loading ? <>
                             <Box
@@ -166,7 +172,7 @@ const PaginationApiTestPage = () => {
                             >
                                 <CircularProgress />
                             </Box>
-                            </> : <>
+                        </> : <>
                             <DataGrid
                                 rows={rows}
                                 columns={columns}

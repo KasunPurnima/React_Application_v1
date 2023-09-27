@@ -7,6 +7,7 @@ import {
     Box,
     CircularProgress,
     Grid,
+    Button,
     IconButton,
     OutlinedInput,
     Snackbar,
@@ -19,7 +20,7 @@ import MuiAlert from '@mui/material/Alert';
 import MainCard from 'components/MainCard';
 
 // assets
-import { DeleteTwoTone, EditTwoTone, SearchOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
 
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
@@ -133,7 +134,7 @@ const ExistinggroupsoldPage = () => {
     const [totalDataCount, setTotalDataCount] = useState(0)
 
     const fetchData = async (queryParams = {}) => {
-   // const fetchData = async (page) => {
+        // const fetchData = async (page) => {
         try {
             setLoading(true);
             const response = await axios.get(
@@ -143,7 +144,7 @@ const ExistinggroupsoldPage = () => {
                         'adminUserId': 'nble'
                     },
                     params: {
-                        per_page: queryParams.per_page || '',    
+                        per_page: queryParams.per_page || '',
                     },
                 }
             );
@@ -179,9 +180,15 @@ const ExistinggroupsoldPage = () => {
         <>
             <Grid container spacing={2}>
                 <Grid item md={12}>
+                
                     <MainCard>
                         <Stack direction="row" spacing={2} justifyContent="space-between"  >
                             <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                                <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => { }}>
+                                    Add New 
+                                </Button>
+                            </Stack>
                         </Stack>
                         {loading ? <>
                             <Box
