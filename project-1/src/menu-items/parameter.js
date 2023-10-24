@@ -1,7 +1,7 @@
 // assets
-import { BankOutlined, HourglassOutlined,SwapOutlined,AlertOutlined } from '@ant-design/icons';
+import { BankOutlined, HourglassOutlined, SwapOutlined, AlertOutlined } from '@ant-design/icons';
 // icons
-const icons = { BankOutlined, HourglassOutlined, SwapOutlined,AlertOutlined };
+const icons = { BankOutlined, HourglassOutlined, SwapOutlined, AlertOutlined };
 
 // ==============================|| MENU ITEMS - PARAMETER ||============================== //
 
@@ -19,14 +19,14 @@ const parameter = {
     },
     {
       id: 'existinggroupsnew',
-      title: 'Get Existing Groups New',
+      title: 'Existing Workflow Details',
       type: 'item',
       url: '/parameter/get_existing-groups-new',
       icon: icons.HourglassOutlined
     },
     {
       id: 'existinggroupsold',
-      title: 'Get Existing Groups Old',
+      title: 'Own Requests',
       type: 'item',
       url: '/parameter/get_existing-groups-old',
       icon: icons.SwapOutlined
@@ -38,6 +38,14 @@ const parameter = {
       url: '/parameter/get-pagiantion-api-test',
       icon: icons.AlertOutlined
     },
+
+    {
+      id: 'usergroups',
+      title: 'Existing Groups',
+      type: 'item',
+      url: '/parameter/get-user-groups',
+      icon: icons.SwapOutlined
+    }
   ]
 };
 

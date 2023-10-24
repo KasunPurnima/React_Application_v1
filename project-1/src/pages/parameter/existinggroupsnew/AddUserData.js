@@ -1,16 +1,24 @@
-import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { forwardRef, useEffect, useState } from 'react';
 
 // material-ui
-import { Box, CircularProgress, Grid, Button, IconButton, OutlinedInput, Snackbar, Stack, Tooltip } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  // IconButton,
+  OutlinedInput,
+  Snackbar,
+  Stack
+} from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+import { DataGrid } from '@mui/x-data-grid';
 
 // project import
 import MainCard from 'components/MainCard';
 
 // assets
-import { DeleteTwoTone, EditTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
@@ -44,58 +52,20 @@ const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-// ==============================|| ExistinggroupsoldPage ||============================== //
-
-const ExistinggroupsoldPage = () => {
-  //table
+const AddUserData = () => {
+  // Table data
   const [rows, setRows] = useState([]);
   const preGlobalFilteredRows = rows || [];
   const [globalFilter, setGlobalFilter] = useState('');
 
+  // Define table columns
   const columns = [
-    // { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'groupId', headerName: 'Group Id', flex: 1 },
-    { field: 'groupName', headerName: 'Group Name', flex: 1 },
-    { field: 'companyId', headerName: 'Company Id', flex: 1 },
+    { field: 'userId', headerName: 'User ID', flex: 1 },
     { field: 'status', headerName: 'Status', flex: 1 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 1,
-      sortable: false,
-      filterable: false,
-      renderCell: () => {
-        return (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Tooltip title="Edit">
-              <IconButton
-                color=""
-                onClick={(e) => {
-                  // handleEdit(params.row);
-                  e.stopPropagation();
-                }}
-              >
-                <EditTwoTone />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton
-                color="error"
-                onClick={(e) => {
-                  // handleDelete(params.row);
-                  e.stopPropagation();
-                }}
-              >
-                <DeleteTwoTone />
-              </IconButton>
-            </Tooltip>
-          </div>
-        );
-      }
-    }
+    { field: 'username', headerName: 'Username', flex: 1 },
+    { field: 'uid', headerName: 'UID', flex: 1 }
   ];
 
-  //snack bar
   const [open, setOpen] = useState(false);
   const [snackbarContent, setSnackbarContent] = useState({
     severity: '',
@@ -120,25 +90,25 @@ const ExistinggroupsoldPage = () => {
 
   // API calls
   const [loading, setLoading] = useState(false);
-  const [totalDataCount, setTotalDataCount] = useState(0);
 
-  const fetchData = async (queryParams = {}) => {
-    // const fetchData = async (page) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://10.30.2.111:9081/workflow2/v3/groups/existing`, {
-        headers: {
-          adminUserId: 'nble'
-        },
+      const response = await axios.get(`////http://localhost:9081/v3/workflow/create/admin///`, {
+        headers: {},
         params: {
-          per_page: queryParams.per_page || ''
+          search: globalFilter || ''
         }
       });
-      const mappedData = response.data.groupDTO.map((item, index) => ({
-        id: index,
-        ...item
+
+      const mappedData = response.data.result.map((item, index) => ({
+        username: item.username,
+        status: item.status,
+        userid: item.level,
+        uid: item.uid,
+        id: index
       }));
-      setTotalDataCount(response.totalDataCount);
+
       setRows(mappedData);
     } catch (err) {
       if (!err.response) {
@@ -159,7 +129,7 @@ const ExistinggroupsoldPage = () => {
   };
 
   useEffect(() => {
-    fetchData({ search: globalFilter });
+    fetchData();
   }, [globalFilter]);
 
   return (
@@ -169,11 +139,6 @@ const ExistinggroupsoldPage = () => {
           <MainCard>
             <Stack direction="row" spacing={2} justifyContent="space-between">
               <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => {}}>
-                  Add New
-                </Button>
-              </Stack>
             </Stack>
             {loading ? (
               <>
@@ -183,34 +148,13 @@ const ExistinggroupsoldPage = () => {
               </>
             ) : (
               <>
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  pagination
-                  pageSize={10} // Set your desired page size
-                  rowCount={totalDataCount} // Replace with the actual total count from your API response
-                  onPageChange={(newPage) => {
-                    fetchData({ page: newPage + 1 }); // Add 1 to newPage to match your API's page numbering
-                  }}
-                  autoHeight
-                  autoWidth
-                  sx={{ mt: 3 }}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { page: 0, pageSize: 10 }
-                    }
-                  }}
-                  onPageSizeChange={(newPageSize) => {
-                    fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
-                  }}
-                  pageSizeOptions={[5, 10]}
-                />
+                <DataGrid rows={rows} columns={columns} autoHeight autoWidth sx={{ mt: 3 }} />
               </>
             )}
           </MainCard>
         </Grid>
       </Grid>
-      {/* snackbar model */}
+
       {open && (
         <>
           <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
@@ -224,4 +168,4 @@ const ExistinggroupsoldPage = () => {
   );
 };
 
-export default ExistinggroupsoldPage;
+export default AddUserData;

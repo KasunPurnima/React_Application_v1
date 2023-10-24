@@ -15,9 +15,9 @@ const CurrencyPage = Loadable(lazy(() => import('pages/parameter/currency/Curren
 const ExistinggroupsnewPage = Loadable(lazy(() => import('pages/parameter/existinggroupsnew/ExistinggroupsnewPage')));
 const ExistinggroupsoldPage = Loadable(lazy(() => import('pages/parameter/existinggroupsold/ExistinggroupsoldPage')));
 const PaginationApiTestPage = Loadable(lazy(() => import('pages/parameter/paginationtest/PaginationApiTestPage')));
-
-
-
+const AddUserGroup = Loadable(lazy(() => import('pages/parameter/usergroups/AddUserGroup')));
+// const AuthorizationLevelsPage = Loadable(lazy(() => import('pages/parameter/existinggroupsnew/AuthorizationLevelsPage')));
+// const AddEditWorkflow = Loadable(lazy(() => import('pages/parameter/existinggroupsnew/AddEditWorkflow')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -28,7 +28,7 @@ const MainRoutes = {
     {
       path: '/',
       element: <DashboardDefault />
-    }, 
+    },
     {
       path: 'dashboard',
       children: [
@@ -65,9 +65,24 @@ const MainRoutes = {
         {
           path: 'get-pagiantion-api-test',
           element: <PaginationApiTestPage />
+        },
+
+        {
+          path: 'get-user-groups',
+          element: <AddUserGroup />
         }
+
+        // {
+        //   path: 'get-authorization',
+        //   element: <AuthorizationLevelsPage />
+        // },
+
+        // {
+        //   path: 'get-Addworkflow',
+        //   element: <AddEditWorkflow/>
+        // }
       ]
-    },
+    }
   ]
 };
 

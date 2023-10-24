@@ -3,7 +3,7 @@ import axios from 'axios';
 import { forwardRef, useEffect, useState } from 'react';
 
 // material-ui
-import { Box, CircularProgress, Grid, Button, IconButton, OutlinedInput, Snackbar, Stack, Tooltip } from '@mui/material';
+import { Box, CircularProgress, Grid, IconButton, OutlinedInput, Snackbar, Stack, Tooltip, Button, Dialog, Slide } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 
 // project import
@@ -11,6 +11,7 @@ import MainCard from 'components/MainCard';
 
 // assets
 import { DeleteTwoTone, EditTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import AddUserForm from './AddUserForm';
 
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
@@ -44,26 +45,33 @@ const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-// ==============================|| ExistinggroupsoldPage ||============================== //
-
-const ExistinggroupsoldPage = () => {
+const AddUserGroup = () => {
   //table
   const [rows, setRows] = useState([]);
   const preGlobalFilteredRows = rows || [];
   const [globalFilter, setGlobalFilter] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
 
   const columns = [
     // { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'groupId', headerName: 'Group Id', flex: 1 },
-    { field: 'groupName', headerName: 'Group Name', flex: 1 },
     { field: 'companyId', headerName: 'Company Id', flex: 1 },
+    { field: 'groupName', headerName: 'Group Name', flex: 1 },
     { field: 'status', headerName: 'Status', flex: 1 },
+    { field: 'approvalStatus', headerName: 'Approval Status', flex: 1 },
     {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 1,
-      sortable: false,
-      filterable: false,
+      //   field: 'actions',
+      //   headerName: 'Actions',
+      //   flex: 1,
+      //   sortable: false,
+      //   filterable: false,
       renderCell: () => {
         return (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -114,31 +122,42 @@ const ExistinggroupsoldPage = () => {
     if (reason === 'clickaway') {
       return;
     }
-
     setOpen(false);
   };
 
   // API calls
   const [loading, setLoading] = useState(false);
   const [totalDataCount, setTotalDataCount] = useState(0);
+  const [page, setpage] = useState(0);
+  const [perPage, setPerPage] = useState(100);
 
   const fetchData = async (queryParams = {}) => {
-    // const fetchData = async (page) => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://10.30.2.111:9081/workflow2/v3/groups/existing`, {
+      setpage(queryParams.page || 0);
+      setPerPage(queryParams.per_page || 10);
+      const response = await axios.get(`http://10.30.2.111:9081/workflow2/v3/v4/groups/existing`, {
         headers: {
           adminUserId: 'nble'
         },
         params: {
-          per_page: queryParams.per_page || ''
+          page: queryParams.page || 0,
+          per_page: queryParams.per_page || 10,
+          sort: queryParams.sort || 'groupId',
+          direction: queryParams.direction || 'ASC',
+          search: queryParams.search || ''
         }
       });
-      const mappedData = response.data.groupDTO.map((item, index) => ({
-        id: index,
-        ...item
+
+      const mappedData = response.data.result.map((item, index) => ({
+        companyId: item.companyId,
+        groupName: item.groupName,
+        status: item.status,
+        approvalStatus: item.approvalStatus,
+        id: index
       }));
-      setTotalDataCount(response.totalDataCount);
+
+      setTotalDataCount(response.data.pagination.total);
       setRows(mappedData);
     } catch (err) {
       if (!err.response) {
@@ -158,6 +177,26 @@ const ExistinggroupsoldPage = () => {
     }
   };
 
+  // const handleAddNewUser = async ({ companyId, groupName }) => {
+  //   try {
+  //     axios.post(
+  //       `http://10.30.2.111:9081/workflow2/v3/v4/groups/existing`,
+  //       {
+  //         companyId: companyId,
+  //         groupName: groupName
+  //       },
+  //       {
+  //         headers: {
+  //           adminUserId: 'nble'
+  //         }
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   fetchData({ search: globalFilter });
+  // };
+
   useEffect(() => {
     fetchData({ search: globalFilter });
   }, [globalFilter]);
@@ -170,12 +209,26 @@ const ExistinggroupsoldPage = () => {
             <Stack direction="row" spacing={2} justifyContent="space-between">
               <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
               <Stack direction="row" alignItems="center" spacing={1}>
-                <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => {}}>
-                  Add New
+                <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleOpenDialog}>
+                  Add New Group
                 </Button>
               </Stack>
             </Stack>
-            {loading ? (
+
+            {isDialogOpen ? (
+              <Dialog
+                maxWidth="sm"
+                TransitionComponent={Slide}
+                keepMounted
+                fullWidth
+                onClose={handleCloseDialog}
+                open={isDialogOpen}
+                sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+                aria-describedby="alert-dialog-slide-description"
+              >
+                <AddUserForm onCancel={handleCloseDialog} />
+              </Dialog>
+            ) : loading ? (
               <>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50vh' }}>
                   <CircularProgress />
@@ -187,23 +240,22 @@ const ExistinggroupsoldPage = () => {
                   rows={rows}
                   columns={columns}
                   pagination
-                  pageSize={10} // Set your desired page size
-                  rowCount={totalDataCount} // Replace with the actual total count from your API response
-                  onPageChange={(newPage) => {
-                    fetchData({ page: newPage + 1 }); // Add 1 to newPage to match your API's page numbering
-                  }}
+                  pageSize={perPage}
+                  rowCount={totalDataCount}
                   autoHeight
                   autoWidth
                   sx={{ mt: 3 }}
                   initialState={{
                     pagination: {
-                      paginationModel: { page: 0, pageSize: 10 }
+                      paginationModel: { page: page, pageSize: perPage }
                     }
                   }}
-                  onPageSizeChange={(newPageSize) => {
-                    fetchData({ page: 1, per_page: newPageSize }); // Fetch data with the new page size
+                  onPaginationModelChange={(e) => {
+                    console.log(e);
+                    fetchData({ page: e.page, per_page: e.pageSize });
                   }}
-                  pageSizeOptions={[5, 10]}
+                  pageSizeOptions={[5, 10, 20]}
+                  paginationMode="server"
                 />
               </>
             )}
@@ -224,4 +276,4 @@ const ExistinggroupsoldPage = () => {
   );
 };
 
-export default ExistinggroupsoldPage;
+export default AddUserGroup;

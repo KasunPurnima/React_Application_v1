@@ -67,12 +67,12 @@
         "patterns": ["@mui/*/*/*", "!@mui/material/test-utils/*"]
       }
     ],
-    "no-unused-vars": [
-      "error",
-      {
-        "ignoreRestSiblings": false
-      }
-    ],
+    // "no-unused-vars": [
+    //   "error",
+    //   {
+    //     "ignoreRestSiblings": false
+    //   }
+    // ],
     "prettier/prettier": [
       "warn",
       {

@@ -3,238 +3,269 @@ import axios from 'axios';
 import { forwardRef, useEffect, useState } from 'react';
 
 // material-ui
-import {
-    Box,
-    CircularProgress,
-    Grid,
-    IconButton,
-    OutlinedInput,
-    Snackbar,
-    Stack,
-    Tooltip
-} from '@mui/material';
+import { Box, CircularProgress, Grid, IconButton, OutlinedInput, Snackbar, Stack, Tooltip, Button, Dialog, Slide } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 
 // project import
 import MainCard from 'components/MainCard';
 
 // assets
-import { DeleteTwoTone, EditTwoTone, SearchOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import AddEditWorkflow from './AddEditWorkflow';
+import AuthorizationLevelsPage from './AuthorizationLevelsPage';
 
 // ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
-    const count = preGlobalFilteredRows.length;
-    const [value, setValue] = useState(globalFilter);
-    let debounceTimeout;
+  const count = preGlobalFilteredRows.length;
+  const [value, setValue] = useState(globalFilter);
+  let debounceTimeout;
 
-    const onChange = (value) => {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(() => {
-            setGlobalFilter(value || undefined);
-        }, 200);
-    };
+  const onChange = (value) => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      setGlobalFilter(value || undefined);
+    }, 200);
+  };
 
-
-    return (
-        <OutlinedInput
-            value={value || ''}
-            onChange={(e) => {
-                setValue(e.target.value);
-                onChange(e.target.value);
-            }}
-            placeholder={`Search ${count} records...`}
-            id="start-adornment-email"
-            startAdornment={<SearchOutlined />}
-            {...other}
-        />
-    );
+  return (
+    <OutlinedInput
+      value={value || ''}
+      onChange={(e) => {
+        setValue(e.target.value);
+        onChange(e.target.value);
+      }}
+      placeholder={`Search ${count} records...`}
+      id="start-adornment-email"
+      startAdornment={<SearchOutlined />}
+      {...other}
+    />
+  );
 }
 
 const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 // ==============================|| ExistinggroupsnewPage ||============================== //
 
 const ExistinggroupsnewPage = () => {
-    //table
-    const [rows, setRows] = useState([])
-    const preGlobalFilteredRows = rows || [];
-    const [globalFilter, setGlobalFilter] = useState("");
+  //table
+  const [rows, setRows] = useState([]);
+  const preGlobalFilteredRows = rows || [];
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const columns = [
-        // { field: 'id', headerName: 'ID', flex: 1 }, 
-        { field: 'groupId', headerName: 'Group Id', flex: 1 },
-        { field: 'groupName', headerName: 'Group Name', flex: 1 },
-        { field: 'companyId', headerName: 'Company Id', flex: 1 },
-        { field: 'status', headerName: 'Status', flex: 1 },
-        {
-            field: 'actions',
-            headerName: 'Actions',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            renderCell: () => {
-                return (
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <Tooltip title="Edit">
-                            <IconButton
-                                color=""
-                                onClick={(e) => {
-                                    // handleEdit(params.row);
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <EditTwoTone />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                            <IconButton
-                                color="error"
-                                onClick={(e) => {
-                                    // handleDelete(params.row);
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <DeleteTwoTone />
-                            </IconButton>
-                        </Tooltip>
-                    </div>
-                );
-            },
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const columns = [
+    // { field: 'id', headerName: 'ID', flex: 1 },
+    { field: 'companyId', headerName: 'Company Id', flex: 1 },
+    { field: 'createdBy', headerName: 'Created By', flex: 1 },
+    { field: 'workflowId', headerName: 'Workflow Id', flex: 1 },
+    { field: 'createdDate', headerName: 'Created Date', flex: 1 },
+    { field: 'createdParty', headerName: 'Created Party', flex: 1 },
+    { field: 'groupName', headerName: 'Group Name', flex: 1 },
+    { field: 'status', headerName: 'Status', flex: 1 },
+    { field: 'approvalStatus', headerName: 'Approval Status', flex: 1 },
+    {
+      //   field: 'actions',
+      //   headerName: 'Actions',
+      //   flex: 1,
+      //   sortable: false,
+      //   filterable: false,
+      renderCell: () => {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Tooltip title="Edit">
+              <IconButton
+                color=""
+                onClick={(e) => {
+                  // handleEdit(params.row);
+                  e.stopPropagation();
+                }}
+              >
+                <EditTwoTone />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                color="error"
+                onClick={(e) => {
+                  // handleDelete(params.row);
+                  e.stopPropagation();
+                }}
+              >
+                <DeleteTwoTone />
+              </IconButton>
+            </Tooltip>
+          </div>
+        );
+      }
+    }
+  ];
+
+  //snack bar
+  const [open, setOpen] = useState(false);
+  const [snackbarContent, setSnackbarContent] = useState({
+    severity: '',
+    description: ''
+  });
+
+  const handleClick = ({ severity, description }) => {
+    setSnackbarContent({
+      severity: severity,
+      description: description
+    });
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  // API calls
+  const [loading, setLoading] = useState(false);
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [page, setpage] = useState(0);
+  const [perPage, setPerPage] = useState(100);
+
+  const fetchData = async (queryParams = {}) => {
+    try {
+      setLoading(true);
+      setpage(queryParams.page || 0);
+      setPerPage(queryParams.per_page || 10);
+      const response = await axios.get(`http://10.30.2.111:9081/workflow2/v3/v4/groups/existing`, {
+        headers: {
+          adminUserId: 'nble'
         },
-    ];
-
-    //snack bar
-    const [open, setOpen] = useState(false);
-    const [snackbarContent, setSnackbarContent] = useState({
-        severity: "",
-        description: ""
-    })
-
-    const handleClick = ({ severity, description }) => {
-        setSnackbarContent({
-            severity: severity,
-            description: description
-        })
-        setOpen(true);
-    };
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
+        params: {
+          page: queryParams.page || 0,
+          per_page: queryParams.per_page || 10,
+          sort: queryParams.sort || 'groupId',
+          direction: queryParams.direction || 'ASC',
+          search: queryParams.search || ''
         }
+      });
 
-        setOpen(false);
-    };
+      const mappedData = response.data.result.map((item, index) => ({
+        companyId: item.companyId,
+        createdBy: item.createdBy,
+        workflowId: item.workflowId,
+        createdDate: item.createdDate,
+        createdParty: item.createdParty,
+        groupName: item.groupName,
+        status: item.status,
+        approvalStatus: item.approvalStatus,
+        id: index
+      }));
 
-    // API calls
-    const [loading, setLoading] = useState(false);
-    const [totalDataCount, setTotalDataCount] = useState(0)
-    const [page, setpage] = useState(0)
-    const [perPage, setPerPage] = useState(100)
+      setTotalDataCount(response.data.pagination.total);
+      setRows(mappedData);
+    } catch (err) {
+      if (!err.response) {
+        handleClick({
+          severity: 'error',
+          description: 'Something went wrong ...'
+        });
+        return;
+      }
+      handleClick({
+        severity: 'error',
+        description: err.response.data.description
+      });
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const fetchData = async (queryParams = {}) => {
-        try {
-            setLoading(true);
-            setpage(queryParams.page || 0)
-            setPerPage(queryParams.per_page || 10)
-            const response = await axios.get(
-                `http://10.30.2.111:9081/workflow2/v3/v4/groups/existing`,
-                {
-                    headers: {
-                        'adminUserId': 'nble'
-                    },
-                    params: {
-                        page: queryParams.page || 0,
-                        per_page: queryParams.per_page || 10,
-                        sort: queryParams.sort || 'groupId',
-                        direction: queryParams.direction || 'ASC',
-                        search: queryParams.search || '',
-                    },
-                }
-            );
-            const mappedData = response.data.result.map((item, index) => ({
-                id: index,
-                ...item
-            }));
+  useEffect(() => {
+    fetchData({ search: globalFilter });
+  }, [globalFilter]);
 
-            setTotalDataCount(response.data.pagination.total)
-            setRows(mappedData);
-        } catch (err) {
-            if (!err.response) {
-                handleClick({
-                    severity: "error",
-                    description: 'Something went wrong ...'
-                })
-                return;
-            }
-            handleClick({
-                severity: "error",
-                description: err.response.data.description
-            })
-            console.log(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+  return (
+    <>
+      <Grid container spacing={2}>
+        <Grid item md={12}>
+          <MainCard>
+            <Stack direction="row" spacing={2} justifyContent="space-between">
+              <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleOpenDialog}>
+                  Add New Workflow
+                </Button>
+              </Stack>
+            </Stack>
 
-    useEffect(() => {
-        fetchData({ search: globalFilter });
-    }, [globalFilter]);
-
-    return (
+            {isDialogOpen ? (
+              <Dialog
+                maxWidth="sm"
+                TransitionComponent={Slide}
+                keepMounted
+                fullWidth
+                onClose={handleCloseDialog}
+                open={isDialogOpen}
+                sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+                aria-describedby="alert-dialog-slide-description"
+              >
+                <AddEditWorkflow onCancel={handleCloseDialog} />
+                <AuthorizationLevelsPage />
+              </Dialog>
+            ) : loading ? (
+              <>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50vh' }}>
+                  <CircularProgress />
+                </Box>
+              </>
+            ) : (
+              <>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  pagination
+                  pageSize={perPage}
+                  rowCount={totalDataCount}
+                  autoHeight
+                  autoWidth
+                  sx={{ mt: 3 }}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: page, pageSize: perPage }
+                    }
+                  }}
+                  onPaginationModelChange={(e) => {
+                    console.log(e);
+                    fetchData({ page: e.page, per_page: e.pageSize });
+                  }}
+                  pageSizeOptions={[5, 10, 20]}
+                  paginationMode="server"
+                />
+              </>
+            )}
+          </MainCard>
+        </Grid>
+      </Grid>
+      {/* snackbar model */}
+      {open && (
         <>
-            <Grid container spacing={2}>
-                <Grid item md={12}>
-                    <MainCard>
-                        <Stack direction="row" spacing={2} justifyContent="space-between"  >
-                            <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
-                        </Stack>
-                        {loading ? <>
-                            <Box
-                                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50vh' }}
-                            >
-                                <CircularProgress />
-                            </Box>
-                            </> : <>
-                            <DataGrid
-                                rows={rows}
-                                columns={columns}
-                                pagination
-                                pageSize={perPage}
-                                rowCount={totalDataCount}
-                                autoHeight
-                                autoWidth
-                                sx={{ mt: 3 }}
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: { page: page, pageSize: perPage },
-                                    },
-                                }}
-                                onPaginationModelChange={(e) => {
-                                    console.log(e);
-                                    fetchData({ page: e.page, per_page: e.pageSize });
-                                }}
-                                pageSizeOptions={[5, 10, 20]}
-                                paginationMode='server'
-                            />
-                        </>}
-                    </MainCard>
-                </Grid>
-            </Grid>
-            {/* snackbar model */}
-            {open && <>
-                <Snackbar
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    open={open} autoHideDuration={6000} onClose={handleClose}>
-                    <Alert onClose={handleClose} severity={snackbarContent.severity || "success"} sx={{ width: '100%' }}>
-                        {snackbarContent.description || ''}
-                    </Alert>
-                </Snackbar>
-            </>}
+          <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity={snackbarContent.severity || 'success'} sx={{ width: '100%' }}>
+              {snackbarContent.description || ''}
+            </Alert>
+          </Snackbar>
         </>
-    )
-}
+      )}
+    </>
+  );
+};
 
 export default ExistinggroupsnewPage;
