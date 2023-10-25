@@ -65,7 +65,7 @@ const AddUserGroup = () => {
     { field: 'companyId', headerName: 'Company Id', flex: 1 },
     { field: 'groupName', headerName: 'Group Name', flex: 1 },
     { field: 'status', headerName: 'Status', flex: 1 },
-    { field: 'createdDate', headerName: 'createdDate', flex: 1 },
+    { field: 'createdDate', headerName: 'Created Date', flex: 1 },
     { field: 'groupId', headerName: 'Group Id', flex: 1 },
     {
       //   field: 'actions',
