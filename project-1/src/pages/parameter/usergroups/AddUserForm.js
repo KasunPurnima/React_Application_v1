@@ -22,6 +22,8 @@ import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import TablePagination from '@mui/material/TablePagination';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const getInitialValues = () => {
   return {
@@ -63,6 +65,7 @@ const AddUserForm = ({ onCancel, addUser }) => {
   const displayedData = userData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   const [selectedRows, setSelectedRows] = useState([]);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const fetchUserData = async () => {
     try {
@@ -130,6 +133,7 @@ const AddUserForm = ({ onCancel, addUser }) => {
       });
 
       if (response.data.statusCode === 'success.') {
+        handleSnackbarOpen();
         setSuccessMessage('Group successfully created');
       } else {
         setSuccessMessage('Error creating the groups');
@@ -140,13 +144,25 @@ const AddUserForm = ({ onCancel, addUser }) => {
     }
   };
 
+  const handleSnackbarOpen = () => {
+    setOpenSnackbar(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackbar(false);
+  };
+
   return (
     <>
       <FormikProvider value={formik}>
         <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
           <DialogTitle>Create User Group</DialogTitle>
           <Divider />
-          <DialogContent sx={{ p: 2.5 }}>
+          <DialogContent sx={{ p: 2.5, maxWidth: '400px', maxHeight: '400px', overflow: 'auto' }}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={12}>
                 <Grid container spacing={3}>
@@ -197,8 +213,8 @@ const AddUserForm = ({ onCancel, addUser }) => {
                     <TableCell>
                       <Checkbox checked={selectedRows.includes(user.userId)} onChange={(event) => handleRowSelect(event, user.userId)} />
                     </TableCell>
-                    <TableCell>{user.userId}</TableCell>
-                    <TableCell>{user.userName}</TableCell>
+                    <TableCell sx={{ height: '40px', fontSize: '14px' }}>{user.userId}</TableCell>
+                    <TableCell sx={{ height: '40px', fontSize: '14px' }}>{user.userName}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -225,7 +241,7 @@ const AddUserForm = ({ onCancel, addUser }) => {
           </TableContainer>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 15, 20]}
+            rowsPerPageOptions={[3, 10, 15, 20]}
             component="div"
             count={userData.length}
             rowsPerPage={rowsPerPage}
@@ -236,6 +252,17 @@ const AddUserForm = ({ onCancel, addUser }) => {
               setPage(0);
             }}
           />
+
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <MuiAlert elevation={6} variant="filled" onClose={handleSnackbarClose} severity="success">
+              {successMessage}
+            </MuiAlert>
+          </Snackbar>
 
           <DialogActions sx={{ p: 2.5 }}>
             <Grid container justifyContent="space-between" alignItems="center">

@@ -1,19 +1,13 @@
-import { DataGrid } from '@mui/x-data-grid';
-import axios from 'axios';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { forwardRef, useEffect, useState } from 'react';
-
-// material-ui
 import { Box, CircularProgress, Grid, IconButton, OutlinedInput, Snackbar, Stack, Tooltip, Button, Dialog, Slide } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-
-// project import
 import MainCard from 'components/MainCard';
-
-// assets
 import { DeleteTwoTone, EditTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import AddUserForm from './AddUserForm';
+import ApproverDetailsTable from './ApproverDetailsTable';
+import OwnRequest from './OwnRequestTable';
 
-// ==============================|| Components ||============================== //
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
   const count = preGlobalFilteredRows.length;
   const [value, setValue] = useState(globalFilter);
@@ -45,42 +39,25 @@ const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const AddUserGroup = () => {
-  //table
-  const [rows, setRows] = useState([]);
-  const preGlobalFilteredRows = rows || [];
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-  };
+const PendingRequestsTable = () => {
+  const [pendingRequests] = useState([
+    { companyId: 'C001', groupName: 'Group 1', groupId: 'G001', approvalStatus: 'Pending', id: 1 },
+    { companyId: 'C002', groupName: 'Group 2', groupId: 'G002', approvalStatus: 'Pending', id: 2 }
+  ]);
 
   const columns = [
-    // { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'companyId', headerName: 'Company Id', flex: 1 },
     { field: 'groupName', headerName: 'Group Name', flex: 1 },
-    { field: 'status', headerName: 'Status', flex: 1 },
-    { field: 'createdDate', headerName: 'Created Date', flex: 1 },
     { field: 'groupId', headerName: 'Group Id', flex: 1 },
+    { field: 'approvalStatus', headerName: 'Approval Status', flex: 1 },
     {
-      //   field: 'actions',
-      //   headerName: 'Actions',
-      //   flex: 1,
-      //   sortable: false,
-      //   filterable: false,
       renderCell: () => {
         return (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Tooltip title="Edit">
               <IconButton
-                color=""
+                color="error"
                 onClick={(e) => {
-                  // handleEdit(params.row);
                   e.stopPropagation();
                 }}
               >
@@ -91,7 +68,6 @@ const AddUserGroup = () => {
               <IconButton
                 color="error"
                 onClick={(e) => {
-                  // handleDelete(params.row);
                   e.stopPropagation();
                 }}
               >
@@ -104,7 +80,136 @@ const AddUserGroup = () => {
     }
   ];
 
-  //snack bar
+  return <DataGrid rows={pendingRequests} columns={columns} pagination pageSize={10} autoHeight autoWidth sx={{ mt: 3 }} />;
+};
+
+const OwnRequestsTable = ({ setSelectedRowData, setIsOwnRequestDialogOpen }) => {
+  const [ownRequests] = useState([
+    {
+      companyId: 'C003',
+      groupName: 'Group 3',
+      groupId: 'G003',
+      recordStatus: 'Active',
+      approvalStatus: 'Approved',
+      action: 'CREATE',
+      requestCreatedDate: '12-12-2023',
+      id: 3
+    },
+    {
+      companyId: 'C003',
+      groupName: 'Group 3',
+      groupId: 'G003',
+      recordStatus: 'Active',
+      approvalStatus: 'Approved',
+      action: 'CREATE',
+      requestCreatedDate: '12-12-2023',
+      id: 4
+    }
+  ]);
+
+  const columns = [
+    { field: 'companyId', headerName: 'Company Id', flex: 1 },
+    { field: 'groupName', headerName: 'Group Name', flex: 1 },
+    { field: 'groupId', headerName: 'Group Id', flex: 1 },
+    { field: 'recordStatus', headerName: 'Record Status', flex: 1 },
+    { field: 'approvalStatus', headerName: 'Approval Status', flex: 1 },
+    { field: 'action', headerName: 'Action', flex: 1 },
+    { field: 'requestCreatedDate', headerName: 'Request Created Date', flex: 1 },
+    {
+      renderCell: (params) => {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Tooltip title="View Requests">
+              <IconButton
+                color=""
+                onClick={(e) => {
+                  setSelectedRowData(params.row);
+                  setIsOwnRequestDialogOpen(true);
+                  e.stopPropagation();
+                }}
+              >
+                <EditTwoTone />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                color="error"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <DeleteTwoTone />
+              </IconButton>
+            </Tooltip>
+          </div>
+        );
+      }
+    }
+  ];
+
+  return <DataGrid rows={ownRequests} columns={columns} pagination pageSize={10} autoHeight autoWidth sx={{ mt: 3 }} />;
+};
+
+const AddUserGroup = () => {
+  const [rows, setRows] = useState([]);
+  const [pendingRequests] = useState([
+    { companyId: 'C001', groupName: 'Group 1', groupId: 'G001', approvalStatus: 'Pending', id: 1 },
+    { companyId: 'C002', groupName: 'Group 2', groupId: 'G002', approvalStatus: 'Pending', id: 2 }
+  ]);
+  const preGlobalFilteredRows = rows || [];
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [isViewApprovalsOpen, setIsViewApprovalsOpen] = useState(false);
+  const [isOwnRequestDialogOpen, setIsOwnRequestDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const columns = [
+    { field: 'companyId', headerName: 'Company Id', flex: 1 },
+    { field: 'groupName', headerName: 'Group Name', flex: 1 },
+    { field: 'status', headerName: 'Status', flex: 1 },
+    { field: 'createdDate', headerName: 'Created Date', flex: 1 },
+    { field: 'groupId', headerName: 'Group Id', flex: 1 },
+    {
+      renderCell: (params) => {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Tooltip title="View Approvals">
+              <IconButton
+                color=""
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedRowData(params.row);
+                  setIsViewApprovalsOpen(true);
+                }}
+              >
+                <EditTwoTone />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                color="error"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <DeleteTwoTone />
+              </IconButton>
+            </Tooltip>
+          </div>
+        );
+      }
+    }
+  ];
+
   const [open, setOpen] = useState(false);
   const [snackbarContent, setSnackbarContent] = useState({
     severity: '',
@@ -126,7 +231,8 @@ const AddUserGroup = () => {
     setOpen(false);
   };
 
-  // API calls
+  console.log('isViewApprovalsOpen:', isViewApprovalsOpen);
+
   const [loading, setLoading] = useState(false);
   const [totalDataCount, setTotalDataCount] = useState(0);
   const [page, setpage] = useState(0);
@@ -137,6 +243,8 @@ const AddUserGroup = () => {
       setLoading(true);
       setpage(queryParams.page || 0);
       setPerPage(queryParams.per_page || 10);
+
+      /*
       const response = await axios.get(`http://10.30.2.111:9081/workflow2/v3/v4/groups/existing`, {
         headers: {
           adminUserId: 'nble'
@@ -161,6 +269,24 @@ const AddUserGroup = () => {
 
       setTotalDataCount(response.data.pagination.total);
       setRows(mappedData);
+      */
+
+      const existingGroups = [
+        { companyId: 'C004', groupName: 'Group 4', status: 'Active', createdDate: '01-01-2023', groupId: 'G004', id: 5 },
+        { companyId: 'C005', groupName: 'Group 5', status: 'Inactive', createdDate: '02-01-2023', groupId: 'G005', id: 6 }
+      ];
+
+      const mappedData = existingGroups.map((item, index) => ({
+        companyId: item.companyId,
+        groupName: item.groupName,
+        status: item.status,
+        createdDate: item.createdDate,
+        groupId: item.groupId,
+        id: index
+      }));
+
+      setTotalDataCount(existingGroups.length);
+      setRows(mappedData);
     } catch (err) {
       if (!err.response) {
         handleClick({
@@ -179,26 +305,6 @@ const AddUserGroup = () => {
     }
   };
 
-  // const handleAddNewUser = async ({ companyId, groupName }) => {
-  //   try {
-  //     axios.post(
-  //       `http://10.30.2.111:9081/workflow2/v3/v4/groups/existing`,
-  //       {
-  //         companyId: companyId,
-  //         groupName: groupName
-  //       },
-  //       {
-  //         headers: {
-  //           adminUserId: 'nble'
-  //         }
-  //       }
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  //   fetchData({ search: globalFilter });
-  // };
-
   useEffect(() => {
     fetchData({ search: globalFilter });
   }, [globalFilter]);
@@ -210,6 +316,7 @@ const AddUserGroup = () => {
           <MainCard>
             <Stack direction="row" spacing={2} justifyContent="space-between">
               <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleOpenDialog}>
                   Add New Group
@@ -243,6 +350,7 @@ const AddUserGroup = () => {
                   columns={columns}
                   pagination
                   pageSize={perPage}
+                  components={{ Toolbar: GridToolbar }}
                   rowCount={totalDataCount}
                   autoHeight
                   autoWidth
@@ -256,7 +364,7 @@ const AddUserGroup = () => {
                     console.log(e);
                     fetchData({ page: e.page, per_page: e.pageSize });
                   }}
-                  pageSizeOptions={[5, 10, 20]}
+                  pageSizeOptions={[5, 10, 15]}
                   paginationMode="server"
                 />
               </>
@@ -264,7 +372,21 @@ const AddUserGroup = () => {
           </MainCard>
         </Grid>
       </Grid>
-      {/* snackbar model */}
+
+      <Grid item md={12}>
+        <MainCard title="Pending Requests">
+          <GlobalFilter preGlobalFilteredRows={pendingRequests} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+
+          <PendingRequestsTable />
+        </MainCard>
+      </Grid>
+
+      <Grid item md={12}>
+        <MainCard title="Own Requests">
+          <OwnRequestsTable setIsOwnRequestDialogOpen={setIsOwnRequestDialogOpen} setSelectedRowData={setSelectedRowData} />
+        </MainCard>
+      </Grid>
+
       {open && (
         <>
           <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
@@ -272,7 +394,45 @@ const AddUserGroup = () => {
               {snackbarContent.description || ''}
             </Alert>
           </Snackbar>
+
+          {/* {isViewApprovalsOpen && (
+            <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
+              <Alert onClose={handleClose} severity={snackbarContent.severity || 'success'} sx={{ width: '100%' }}>
+                {snackbarContent.description || ''}
+              </Alert>
+            </Snackbar>
+          )} */}
         </>
+      )}
+
+      {isViewApprovalsOpen == true && (
+        <Dialog
+          maxWidth="sm"
+          TransitionComponent={Slide}
+          keepMounted
+          fullWidth
+          onClose={() => setIsViewApprovalsOpen(false)}
+          open={isViewApprovalsOpen}
+          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <ApproverDetailsTable rowData={selectedRowData} />
+        </Dialog>
+      )}
+
+      {isOwnRequestDialogOpen == true && (
+        <Dialog
+          maxWidth="sm"
+          TransitionComponent={Slide}
+          keepMounted
+          fullWidth
+          onClose={() => setIsOwnRequestDialogOpen(false)}
+          open={isOwnRequestDialogOpen}
+          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <OwnRequest rowData={selectedRowData} />
+        </Dialog>
       )}
     </>
   );

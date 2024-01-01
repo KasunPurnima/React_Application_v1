@@ -17,18 +17,12 @@ const parameter = {
       url: '/parameter/currency-page',
       icon: icons.BankOutlined
     },
+
     {
-      id: 'existinggroupsnew',
-      title: 'Existing Workflow Details',
+      id: 'workflow',
+      title: 'Workflow',
       type: 'item',
-      url: '/parameter/get_existing-groups-new',
-      icon: icons.HourglassOutlined
-    },
-    {
-      id: 'existinggroupsold',
-      title: 'Own Requests',
-      type: 'item',
-      url: '/parameter/get_existing-groups-old',
+      url: '/parameter/get-existing-pending-workflow',
       icon: icons.SwapOutlined
     },
     {
@@ -45,6 +39,13 @@ const parameter = {
       type: 'item',
       url: '/parameter/get-user-groups',
       icon: icons.SwapOutlined
+    },
+    {
+      id: 'branches',
+      title: 'Branches',
+      type: 'item',
+      url: '/parameter/get-branches',
+      icon: icons.AlertOutlined
     }
   ]
 };

@@ -14,12 +14,12 @@ const AuthFooter = () => {
         spacing={2}
         textAlign={matchDownSM ? 'center' : 'inherit'}
       >
-        <Typography variant="subtitle2" color="secondary" component="span">
+        {/* <Typography variant="subtitle2" color="secondary" component="span">
           &copy; Mantis React Dashboard Template By&nbsp;
           <Typography component={Link} variant="subtitle2" href="https://codedthemes.com" target="_blank" underline="hover">
             CodedThemes
           </Typography>
-        </Typography>
+        </Typography> */}
 
         <Stack direction={matchDownSM ? 'column' : 'row'} spacing={matchDownSM ? 1 : 3} textAlign={matchDownSM ? 'center' : 'inherit'}>
           <Typography
