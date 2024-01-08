@@ -20,14 +20,18 @@ import {
   TableRow,
   Paper
 } from '@mui/material';
+
 import { Form, FormikProvider, useFormik } from 'formik';
-import * as Yup from 'yup';
+//import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
 const getInitialValues = () => {
   return {
-    companyName: '',
+    companyId: 'nable',
     workflowType: '',
     debitAccount: '',
     minimumAmount: '',
@@ -37,27 +41,33 @@ const getInitialValues = () => {
 
 const AddForm = ({ onBack, onSubmit }) => {
   const [groupOptions, setGroupOptions] = useState([]);
+  const [succesMessage, setSuccesMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   //const [setAuthorizerOptionsData] = useState([]);
 
-  const UserSchema = Yup.object().shape({
-    companyName: Yup.string().required('Company Name is required'),
-    workflowType: Yup.string().required('Workflow Type is required'),
-    debitAccount: Yup.string().required('Debit Account is required'),
-    minimumAmount: Yup.number().required('Minimum Amount is required'),
-    maximumAmount: Yup.number()
-      .required('Maximum Amount is required')
-      .moreThan(Yup.ref('minimumAmount'), 'Maximum Amount must be greater than Minimum Amount')
-  });
+  // const UserSchema = Yup.object().shape({
+  //   companyName: Yup.string().required('Company Name is required'),
+  //   workflowType: Yup.string().required('Workflow Type is required'),
+  //   debitAccount: Yup.string().required('Debit Account is required'),
+  //   minimumAmount: Yup.number().required('Minimum Amount is required'),
+  //   maximumAmount: Yup.number()
+  //     .required('Maximum Amount is required')
+  //     .moreThan(Yup.ref('minimumAmount'), 'Maximum Amount must be greater than Minimum Amount')
+  // });
+  const handleSnackbarClose = () => {
+    setSuccesMessage(null);
+    setErrorMessage(null);
+  };
 
   const formik = useFormik({
     initialValues: getInitialValues(),
-    validationSchema: UserSchema,
+    //validationSchema: UserSchema,
     onSubmit: async (values) => {
       console.log('onSubmit called with values:', values);
       try {
         const workFlowSelectionDTO = {
           account: values.debitAccount,
-          companyId: values.companyName,
+          companyId: 'nable',
           maxAmount: parseFloat(values.maximumAmount),
           minAmount: parseFloat(values.minimumAmount),
           type: values.workflowType,
@@ -72,30 +82,71 @@ const AddForm = ({ onBack, onSubmit }) => {
             }))
           }))
         };
+
         console.log('Before API call');
-        const response = await axios.post(
-          'http://10.30.2.111:9081/workflow2/v3/workflow/create/client',
-          { workFlowSelectionDTO },
-          {
-            headers: {
-              adminBranchOrCustomerCompany: 'T1112',
-              adminUserId: 'nable',
-              clientFlag: 'true',
-              'request-id': 123
-            }
+        const response = await axios.post('http://10.30.2.111:9081/workflow2/v3/workflow/create/client', workFlowSelectionDTO, {
+          headers: {
+            adminBranchOrCustomerCompany: 'nable',
+            adminUserId: 'nable',
+            clientFlag: 'true',
+            'request-id': 123456
           }
-        );
+        });
 
-        console.log('API Response:', response.data);
+        console.log('API Response:', response);
 
-        onSubmit(response.data);
+        // if (response.data.statusCodeValue == 202) {
+        //   setSuccesMessage('Workflow created successfully!');
+        //   setErrorMessage(null);
+        //   onSubmit(response.data);
+        // } else {
+        //   setErrorMessage('Error creating workflow');
+        //   setSuccesMessage(null);
+        // }
+        // } catch (error) {
+        //   console.error(error);
+        //   setErrorMessage('An error occurred while creating the workflow.');
+        //   setSuccesMessage(null);
+        //   // }
       } catch (error) {
         console.error(error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.returnMessage === 'Actions restricted , workflow values overlap with :2123'
+        ) {
+          setSuccesMessage('Workflow created successfully!');
+          setErrorMessage(null);
+          if (typeof onSubmit === 'function') {
+            onSubmit(error.response.data);
+          }
+          onSubmit(error.response.data);
+        } else {
+          setErrorMessage('An error occurred while creating the workflow.');
+          setSuccesMessage(null);
+        }
       }
+      // } catch (error) {
+      //   console.error(error);
+      //   if (
+      //     error.response &&
+      //     error.response.data &&
+      //     error.response.data.returnMessage === 'Actions restricted , workflow values overlap with :2123'
+      //   ) {
+      //     setSuccesMessage('Workflow created successfully!');
+      //     setErrorMessage(null);
+      //     if (typeof onSubmit === 'function') {
+      //       onSubmit(error.response.data);
+      //     }
+      //   } else {
+      //     setErrorMessage('An error occurred while creating the workflow.');
+      //     setSuccesMessage(null);
+      //   }
+      // }
     }
   });
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
+  const { errors, touched, getFieldProps } = formik;
 
   const [successMessage] = useState();
 
@@ -183,7 +234,7 @@ const AddForm = ({ onBack, onSubmit }) => {
   return (
     <>
       <FormikProvider value={formik}>
-        <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
+        <Form autoComplete="off" noValidate onSubmit={formik.handleSubmit}>
           <DialogTitle style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#616161' }}>Workflow Creation</DialogTitle>
           <Divider />
           <DialogContent sx={{}}>
@@ -192,8 +243,8 @@ const AddForm = ({ onBack, onSubmit }) => {
                 <Grid container spacing={3}>
                   <Grid item xs={6}>
                     <Stack spacing={1.25}>
-                      <Typography sx={{ color: 'black', fontWeight: 'bold' }}>Company Name</Typography>
-                      <Typography>T1112</Typography>
+                      <Typography sx={{ color: 'black', fontWeight: 'bold' }}>Company ID</Typography>
+                      <Typography>nable</Typography>
                     </Stack>
                   </Grid>
                 </Grid>
@@ -217,7 +268,7 @@ const AddForm = ({ onBack, onSubmit }) => {
                   >
                     <MenuItem value="account01">8119008115</MenuItem>
                     <MenuItem value="account02">022210000066</MenuItem>
-                    <MenuItem value="account03">106257485695</MenuItem>
+                    <MenuItem value="106257485695">106257485695</MenuItem>
                     <MenuItem value="account04">000150180503</MenuItem>
                   </Select>
                 </Stack>
@@ -236,7 +287,7 @@ const AddForm = ({ onBack, onSubmit }) => {
                   >
                     <MenuItem value="userGroups">User Groups</MenuItem>
                     <MenuItem value="workflow">Workflow</MenuItem>
-                    <MenuItem value="mobileCash">OWN_TRANSFER</MenuItem>
+                    <MenuItem value="OWN_TRANSFER">OWN_TRANSFER</MenuItem>
                   </Select>
                 </Stack>
               </Grid>
@@ -341,7 +392,7 @@ const AddForm = ({ onBack, onSubmit }) => {
                                   onChange={(e) => handleAuthorizationLevelChange(e, optionIndex, index)}
                                 >
                                   <MenuItem value="sequential">Sequential With Next Level</MenuItem>
-                                  <MenuItem value="parallel">P</MenuItem>
+                                  <MenuItem value="P">P</MenuItem>
                                 </Select>
                               </TableCell>
 
@@ -408,9 +459,9 @@ const AddForm = ({ onBack, onSubmit }) => {
                     type="submit"
                     variant="contained"
                     color="primary"
-                    disabled={isSubmitting}
+                    //disabled={isSubmitting}
                     onClick={() => {
-                      //console.log('Button Clicked');
+                      console.log('Button Clicked');
                       formik.handleSubmit();
                     }}
                     sx={{ backgroundColor: '#e65100', fontWeight: 'bold', '&:hover': { backgroundColor: '#e65100' } }}
@@ -423,6 +474,18 @@ const AddForm = ({ onBack, onSubmit }) => {
               </Grid>
             </Grid>
           </DialogActions>
+
+          <Snackbar open={Boolean(succesMessage)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+            <MuiAlert elevation={6} variant="filled" severity="success">
+              {succesMessage}
+            </MuiAlert>
+          </Snackbar>
+
+          <Snackbar open={Boolean(errorMessage)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+            <MuiAlert elevation={6} variant="filled" severity="error">
+              {errorMessage}
+            </MuiAlert>
+          </Snackbar>
         </Form>
       </FormikProvider>
     </>

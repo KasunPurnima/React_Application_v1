@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-//import axios from 'axios';
+import axios from 'axios';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, CircularProgress, Grid, Snackbar, Stack, Button, Dialog, Slide } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
@@ -13,6 +13,7 @@ import AddWorkflowForm from './AddWorkflowForm';
 import PendingView from './PendingView';
 import ExistingView from './ExistingView';
 import OwnRequestDetailView from './OwnRequestDetailView';
+import { id } from 'date-fns/locale';
 
 function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
   const count = preGlobalFilteredRows.length;
@@ -71,13 +72,13 @@ const AddExistingPendingWorkflow = () => {
     }
   ];
 
-  const [rows] = useState([]);
+  const [rows, setRows] = useState([]);
   const [pendingRows] = useState([]);
   const preGlobalFilteredRows = rows || [];
   const [globalFilter, setGlobalFilter] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [setPage] = useState(0);
+  const [setPageSize] = useState(10);
   const [ownRequestRows] = useState(ownRequestData);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [isPendingViewOpen, setIsPendingViewOpen] = useState(false);
@@ -244,6 +245,39 @@ const AddExistingPendingWorkflow = () => {
 
   const [loading] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://10.30.2.111:9081/workflow2/v3/v4/existing/client', {
+        headers: {
+          adminUserId: 'nable'
+        },
+        params: {
+          companyID: 'nable',
+          direction: 'ASC',
+          page: 2,
+          per_page: 50,
+          sort: 'workflowSelectionId'
+        }
+      });
+      const fetchedData = response.data.result;
+      console.log(response);
+
+      const transformedData = fetchedData.map((item) => ({
+        type: item.type,
+        account: item.account,
+        minAmount: item.minAmount,
+        maxAmount: item.maxAmount,
+        status: item.status,
+        approvalStatus: item.approvalStatus,
+        id: id
+      }));
+
+      setRows(transformedData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   // const fetchData = async (queryParams = {}) => {
   //   try {
   //     setLoading(true);
@@ -326,9 +360,8 @@ const AddExistingPendingWorkflow = () => {
   // };
 
   useEffect(() => {
-    //fetchData({ page, per_page: pageSize });
-    //fetchPendingData();
-  }, [globalFilter, pageSize, page]);
+    fetchData();
+  }, []);
 
   return (
     <>
