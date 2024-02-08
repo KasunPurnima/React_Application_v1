@@ -22,12 +22,13 @@ import {
 } from '@mui/material';
 
 import { Form, FormikProvider, useFormik } from 'formik';
-//import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Autocomplete from '@mui/material/Autocomplete';
+//import Swal from 'sweetalert2';
 
 const getInitialValues = () => {
   return {
@@ -39,25 +40,41 @@ const getInitialValues = () => {
   };
 };
 
-const AddForm = ({ onBack, onSubmit }) => {
+const AddForm = ({ onClose, onSubmit }) => {
   const [groupOptions, setGroupOptions] = useState([]);
   const [succesMessage, setSuccesMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [workflowType, setWorkflowType] = useState('');
   //const [setAuthorizerOptionsData] = useState([]);
 
-  // const UserSchema = Yup.object().shape({
-  //   companyName: Yup.string().required('Company Name is required'),
-  //   workflowType: Yup.string().required('Workflow Type is required'),
-  //   debitAccount: Yup.string().required('Debit Account is required'),
-  //   minimumAmount: Yup.number().required('Minimum Amount is required'),
-  //   maximumAmount: Yup.number()
-  //     .required('Maximum Amount is required')
-  //     .moreThan(Yup.ref('minimumAmount'), 'Maximum Amount must be greater than Minimum Amount')
-  // });
+  // const history = useHistory();
   const handleSnackbarClose = () => {
     setSuccesMessage(null);
     setErrorMessage(null);
   };
+  const handleClose = () => {
+    onClose();
+  };
+  // const handleClose = () => {
+  //   setSuccesMessage(null);
+  //   setErrorMessage(null);
+  // };
+
+  // const handleSuccess = () => {
+  //   setSuccesMessage('Workflow created successfully');
+  //   setErrorMessage(null);
+
+  //   const userConfirmed = window.confirm('Workflow created successfully. Do you want to proceed to the next page?');
+
+  //   if (userConfirmed) {
+  //     history.push('/AddExistingPendingWorkflow');
+  //   }
+  // };
+
+  // const authorizationLevelMapping = {
+  //   'Sequential With Next Level': 'S',
+  //   'Parallel With Next Level': 'P'
+  // };
 
   const formik = useFormik({
     initialValues: getInitialValues(),
@@ -74,7 +91,7 @@ const AddForm = ({ onBack, onSubmit }) => {
           workFlowOptions: workflowLevels.map((option) => ({
             option: option.optionNumber,
             workFlowLevels: option.levels.map((level) => ({
-              explan: level.authorizationLevel,
+              explan: level.authorizationLevel === 'Sequential With Next Level' ? 'S' : 'P',
               gravity: parseInt(level.noOfAuthorizers),
               groupName: level.group,
               level: level.level,
@@ -93,56 +110,31 @@ const AddForm = ({ onBack, onSubmit }) => {
           }
         });
 
-        console.log('API Response:', response);
+        if (response.data.statusCodeValue === 202) {
+          // Swal.fire({
+          //   title: 'Workflow Successfully Added!',
+          //   icon: 'success',
+          //   confirmButtonText: 'OK'
+          // }).then(() => {
+          //   window.location.reload();
+          // });
 
-        // if (response.data.statusCodeValue == 202) {
-        //   setSuccesMessage('Workflow created successfully!');
-        //   setErrorMessage(null);
-        //   onSubmit(response.data);
-        // } else {
-        //   setErrorMessage('Error creating workflow');
-        //   setSuccesMessage(null);
-        // }
-        // } catch (error) {
-        //   console.error(error);
-        //   setErrorMessage('An error occurred while creating the workflow.');
-        //   setSuccesMessage(null);
-        //   // }
-      } catch (error) {
-        console.error(error);
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.returnMessage === 'Actions restricted , workflow values overlap with :2123'
-        ) {
-          setSuccesMessage('Workflow created successfully!');
+          //handleSuccess();
+          setSuccesMessage('Workflow created successfully');
           setErrorMessage(null);
           if (typeof onSubmit === 'function') {
-            onSubmit(error.response.data);
+            onSubmit(values);
           }
-          onSubmit(error.response.data);
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
         } else {
-          setErrorMessage('An error occurred while creating the workflow.');
-          setSuccesMessage(null);
+          setErrorMessage('Error creating workflow. Please try again.');
         }
+      } catch (error) {
+        console.error('API Error:', error);
+        setErrorMessage('Error creating workflow. Please try again.');
       }
-      // } catch (error) {
-      //   console.error(error);
-      //   if (
-      //     error.response &&
-      //     error.response.data &&
-      //     error.response.data.returnMessage === 'Actions restricted , workflow values overlap with :2123'
-      //   ) {
-      //     setSuccesMessage('Workflow created successfully!');
-      //     setErrorMessage(null);
-      //     if (typeof onSubmit === 'function') {
-      //       onSubmit(error.response.data);
-      //     }
-      //   } else {
-      //     setErrorMessage('An error occurred while creating the workflow.');
-      //     setSuccesMessage(null);
-      //   }
-      // }
     }
   });
 
@@ -207,15 +199,37 @@ const AddForm = ({ onBack, onSubmit }) => {
     setWorkflowLevels(newWorkflowLevels);
   };
 
-  const handleGroupChange = (e, optionIndex, levelIndex) => {
+  const handleGroupChange = (e, optionIndex, levelIndex, newValue) => {
     const newWorkflowLevels = [...workflowLevels];
-    newWorkflowLevels[optionIndex].levels[levelIndex].group = e.target.value;
+    newWorkflowLevels[optionIndex].levels[levelIndex].group = newValue?.groupId || '';
     setWorkflowLevels(newWorkflowLevels);
   };
 
-  const handleAuthorizationLevelChange = (e, optionIndex, levelIndex) => {
+  // const handleAuthorizationLevelChange = (e, optionIndex, levelIndex, newValue) => {
+  //   const newWorkflowLevels = [...workflowLevels];
+  //   newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = authorizationLevelMapping[newValue] || '';
+  //   setWorkflowLevels(newWorkflowLevels);
+  // };
+
+  // const handleAuthorizationLevelChange = (e, optionIndex, levelIndex, newValue) => {
+  //   const newWorkflowLevels = [...workflowLevels];
+  //   newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = newValue || '';
+  //   setWorkflowLevels(newWorkflowLevels);
+  // };
+
+  const handleAuthorizationLevelChange = (e, optionIndex, levelIndex, newValue) => {
     const newWorkflowLevels = [...workflowLevels];
-    newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = e.target.value;
+    newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = newValue || '';
+
+    // Map the dropdown value to "S" or "P"
+    if (newValue === 'Sequential With Next Level') {
+      newWorkflowLevels[optionIndex].levels[levelIndex].explan = 'S';
+    } else if (newValue === 'Parallel With Next Level') {
+      newWorkflowLevels[optionIndex].levels[levelIndex].explan = 'P';
+    } else {
+      newWorkflowLevels[optionIndex].levels[levelIndex].explan = ''; // Handle other cases if needed
+    }
+
     setWorkflowLevels(newWorkflowLevels);
   };
 
@@ -252,79 +266,92 @@ const AddForm = ({ onBack, onSubmit }) => {
             </Grid>
           </DialogContent>
           <Divider />
+
           <DialogContent sx={{ p: 2.5 }}>
             <Grid container spacing={3}>
-              <Grid item xs={6}>
+              <Grid item xs={3}>
                 <Stack spacing={1.25}>
-                  <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="debitAccount">
-                    Debit Account
-                  </InputLabel>
-                  <Select
-                    fullWidth
-                    id="debitAccount"
-                    {...getFieldProps('debitAccount')}
-                    value={formik.values.debitAccount}
-                    error={Boolean(touched.debitAccount && errors.debitAccount)}
-                  >
-                    <MenuItem value="account01">8119008115</MenuItem>
-                    <MenuItem value="account02">022210000066</MenuItem>
-                    <MenuItem value="106257485695">106257485695</MenuItem>
-                    <MenuItem value="account04">000150180503</MenuItem>
-                  </Select>
-                </Stack>
-              </Grid>
-              <Grid item xs={6}></Grid>
-              <Grid item xs={6}>
-                <Stack spacing={1.25}>
-                  <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="debitAccount">
+                  <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="workflowType">
                     Workflow Type
                   </InputLabel>
                   <Select
                     fullWidth
                     id="workflowType"
                     {...getFieldProps('workflowType')}
+                    onChange={(e) => {
+                      setWorkflowType(e.target.value);
+                      formik.handleChange(e);
+                    }}
+                    value={workflowType}
                     error={Boolean(touched.workflowType && errors.workflowType)}
+                    sx={{ width: '80%' }}
                   >
-                    <MenuItem value="userGroups">User Groups</MenuItem>
-                    <MenuItem value="workflow">Workflow</MenuItem>
+                    <MenuItem value="USER">USER</MenuItem>
                     <MenuItem value="OWN_TRANSFER">OWN_TRANSFER</MenuItem>
                   </Select>
                 </Stack>
               </Grid>
-              <Grid item xs={6}></Grid>
-              <Grid item xs={6}>
-                <Stack spacing={1.25}>
-                  <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="debitAccount">
-                    Minimum Amount
-                  </InputLabel>
-                  <TextField
-                    fullWidth
-                    id="minimumAmount"
-                    type="number"
-                    placeholder="Enter Minimum Amount"
-                    {...getFieldProps('minimumAmount')}
-                    error={Boolean(touched.minimumAmount && errors.minimumAmount)}
-                    helperText={touched.minimumAmount && errors.minimumAmount}
-                  />
-                </Stack>
-              </Grid>
-              <Grid item xs={6}></Grid>
-              <Grid item xs={6}>
-                <Stack spacing={1.25}>
-                  <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="debitAccount">
-                    Maximum Amount
-                  </InputLabel>
-                  <TextField
-                    fullWidth
-                    id="maximumAmount"
-                    type="number"
-                    placeholder="Enter Maximum Amount"
-                    {...getFieldProps('maximumAmount')}
-                    error={Boolean(touched.maximumAmount && errors.maximumAmount)}
-                    helperText={touched.maximumAmount && errors.maximumAmount}
-                  />
-                </Stack>
-              </Grid>
+              {workflowType === 'USER' ? null : (
+                <>
+                  <Grid item xs={3}>
+                    <Stack spacing={1.25}>
+                      <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="debitAccount">
+                        Debit Account
+                      </InputLabel>
+                      <Select
+                        fullWidth
+                        id="debitAccount"
+                        {...getFieldProps('debitAccount')}
+                        value={formik.values.debitAccount}
+                        error={Boolean(touched.debitAccount && errors.debitAccount)}
+                        sx={{ width: '80%' }}
+                      >
+                        <MenuItem value="account01">001910016519</MenuItem>
+                        <MenuItem value="account02">022210000066</MenuItem>
+                        <MenuItem value="106257485695">106257485695</MenuItem>
+                        <MenuItem value="account04">009210007900</MenuItem>
+                        <MenuItem value="account05">100250022772</MenuItem>
+                        <MenuItem value="account06">000150180503</MenuItem>
+                        <MenuItem value="account07">106257485692</MenuItem>
+                      </Select>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Stack spacing={1.25}>
+                      <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="minimumAmount">
+                        Minimum Amount
+                      </InputLabel>
+                      <TextField
+                        fullWidth
+                        id="minimumAmount"
+                        type="number"
+                        placeholder="Enter Minimum Amount"
+                        {...getFieldProps('minimumAmount')}
+                        error={Boolean(touched.minimumAmount && errors.minimumAmount)}
+                        sx={{ width: '90%' }}
+                        helperText={touched.minimumAmount && errors.minimumAmount}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Stack spacing={1.25}>
+                      <InputLabel sx={{ color: 'black', fontWeight: 'bold' }} htmlFor="maximumAmount">
+                        Maximum Amount
+                      </InputLabel>
+                      <TextField
+                        fullWidth
+                        id="maximumAmount"
+                        type="number"
+                        placeholder="Enter Maximum Amount"
+                        {...getFieldProps('maximumAmount')}
+                        error={Boolean(touched.maximumAmount && errors.maximumAmount)}
+                        sx={{ width: '90%' }}
+                        helperText={touched.maximumAmount && errors.maximumAmount}
+                      />
+                    </Stack>
+                  </Grid>
+                </>
+              )}
             </Grid>
           </DialogContent>
 
@@ -366,14 +393,24 @@ const AddForm = ({ onBack, onSubmit }) => {
                                   ))}
                                 </Select> */}
 
-                                <Select value={level.group} onChange={(e) => handleGroupChange(e, optionIndex, index)}>
-                                  {Array.isArray(groupOptions) &&
-                                    groupOptions.map((group) => (
-                                      <MenuItem key={group.groupId} value={group.groupId}>
-                                        {group.groupName}
-                                      </MenuItem>
-                                    ))}
-                                </Select>
+                                <Autocomplete
+                                  options={groupOptions}
+                                  getOptionLabel={(option) => option?.groupName}
+                                  value={groupOptions.find((option) => option.groupId === level.group) || null}
+                                  disablePortal
+                                  disableClearable
+                                  onChange={(e, newValue) => handleGroupChange(e, optionIndex, index, newValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Please Select Group"
+                                      inputProps={{
+                                        ...params.inputProps
+                                      }}
+                                    />
+                                  )}
+                                  style={{ width: '200px', maxHeight: '400px' }}
+                                />
                               </TableCell>
 
                               <TableCell>
@@ -387,13 +424,30 @@ const AddForm = ({ onBack, onSubmit }) => {
                               </TableCell>
 
                               <TableCell>
-                                <Select
+                                {/* <Autocomplete
+                                  options={['Sequential With Next Level', 'Parallel With Next Level']}
                                   value={level.authorizationLevel}
-                                  onChange={(e) => handleAuthorizationLevelChange(e, optionIndex, index)}
-                                >
-                                  <MenuItem value="sequential">Sequential With Next Level</MenuItem>
-                                  <MenuItem value="P">P</MenuItem>
-                                </Select>
+                                  onChange={(e, newValue) => handleAuthorizationLevelChange(e, optionIndex, index, newValue)}
+                                  renderInput={(params) => <TextField {...params} label="Please Select Level" />}
+                                  style={{ width: '250px', maxHeight: '100px', overflow: 'auto' }}
+                                  disableClearable
+                                /> */}
+                                <Autocomplete
+                                  options={['Sequential With Next Level', 'Parallel With Next Level']}
+                                  value={level.authorizationLevel}
+                                  onChange={(e, newValue) => handleAuthorizationLevelChange(e, optionIndex, index, newValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Please Select Level"
+                                      inputProps={{
+                                        ...params.inputProps
+                                      }}
+                                    />
+                                  )}
+                                  style={{ width: '240px', maxHeight: '400px' }}
+                                  disableClearable
+                                />
                               </TableCell>
 
                               <TableCell>{/* Add your logic for Sequential/Parallel here */}</TableCell>
@@ -444,7 +498,7 @@ const AddForm = ({ onBack, onSubmit }) => {
                 <Stack direction="row" spacing={2} alignItems="center">
                   <Button
                     color="error"
-                    onClick={onBack}
+                    onClick={handleClose}
                     sx={{
                       backgroundColor: '#121858',
                       fontWeight: 'bold',
@@ -452,7 +506,7 @@ const AddForm = ({ onBack, onSubmit }) => {
                       '&:hover': { backgroundColor: '#121858' }
                     }}
                   >
-                    Cancel
+                    Close
                   </Button>
 
                   <Button
@@ -460,10 +514,10 @@ const AddForm = ({ onBack, onSubmit }) => {
                     variant="contained"
                     color="primary"
                     //disabled={isSubmitting}
-                    onClick={() => {
-                      console.log('Button Clicked');
-                      formik.handleSubmit();
-                    }}
+                    // onClick={() => {
+                    //   console.log('Button Clicked');
+                    //   formik.handleSubmit();
+                    // }}
                     sx={{ backgroundColor: '#e65100', fontWeight: 'bold', '&:hover': { backgroundColor: '#e65100' } }}
                   >
                     Create Workflow

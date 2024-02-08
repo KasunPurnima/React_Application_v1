@@ -3,6 +3,8 @@
     "@mui/icons-material": "^5.14.18",
     "@mui/lab": "^5.0.0-alpha.153",
     "@mui/material": "^5.14.18",
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "react-router-dom": "^6.21.1",
+    "sweetalert2": "^11.10.2"
   }
 }

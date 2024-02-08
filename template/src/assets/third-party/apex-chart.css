@@ -2,3 +2,37 @@
   left: -4px !important;
   top: 2px !important;
 }
+/* Add this CSS to your styles file or in the same file where you're using the component */
+.custom-datagrid {
+  /* Adjust border and border-radius as needed */
+  border: 1px solid #951d1d;
+  border-radius: 4px;
+
+  /* Optional: Add box-shadow for a visual separation effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for header cells */
+.custom-datagrid .MuiDataGrid-colCell {
+  border-right: 1px solid #cc1111;
+}
+
+/* Style for data cells */
+.custom-datagrid .MuiDataGrid-cell {
+  border-right: 1px solid #ddd;
+}
+
+/* Style for the last column's border (optional) */
+.custom-datagrid .MuiDataGrid-colCell:last-child {
+  border-right: none;
+}
+
+/* Style for the last data cell's border (optional) */
+.custom-datagrid .MuiDataGrid-cell:last-child {
+  border-right: none;
+}
+
+/* Hover effect for cells (optional) */
+.custom-datagrid .MuiDataGrid-cell:hover {
+  background-color: #f0f0f0;
+}

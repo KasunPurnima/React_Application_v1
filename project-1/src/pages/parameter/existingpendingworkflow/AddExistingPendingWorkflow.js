@@ -4,82 +4,26 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, CircularProgress, Grid, Snackbar, Stack, Button, Dialog, Slide } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import MainCard from 'components/MainCard';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-
-import { OutlinedInput, Tooltip, IconButton } from '@mui/material';
+import { PlusOutlined } from '@ant-design/icons';
+import { Tooltip, IconButton } from '@mui/material';
 import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import Typography from '@mui/material/Typography';
 import AddWorkflowForm from './AddWorkflowForm';
 import PendingView from './PendingView';
 import ExistingView from './ExistingView';
-import OwnRequestDetailView from './OwnRequestDetailView';
-import { id } from 'date-fns/locale';
-
-function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter, ...other }) {
-  const count = preGlobalFilteredRows.length;
-  const [value, setValue] = useState(globalFilter);
-  let debounceTimeout;
-
-  const onChange = (value) => {
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
-      setGlobalFilter(value || undefined);
-    }, 200);
-  };
-
-  return (
-    <OutlinedInput
-      value={value || ''}
-      onChange={(e) => {
-        setValue(e.target.value);
-        onChange(e.target.value);
-      }}
-      placeholder={`Search ${count} records...`}
-      id="start-adornment-email"
-      startAdornment={<SearchOutlined />}
-      {...other}
-    />
-  );
-}
+// import OwnRequestDetailView from './OwnRequestDetailView';
 
 const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
 
 const AddExistingPendingWorkflow = () => {
-  const ownRequestData = [
-    {
-      companyId: '410000158',
-      type: 'User Groups',
-      account: '123456789',
-      minAmount: 100,
-      maxAmount: 500,
-      action: 'UPDATE',
-      reqCreateDate: '22/02/2022',
-      approvalStatus: 'APPROVED',
-      id: 1
-    },
-    {
-      companyId: '410000158',
-      type: 'User Groups',
-      account: '123456789',
-      minAmount: 100,
-      maxAmount: 2000,
-      action: 'UPDATE',
-      reqCreateDate: '20/02/2022',
-      approvalStatus: 'PENDING',
-      id: 2
-    }
-  ];
-
   const [rows, setRows] = useState([]);
   const [pendingRows] = useState([]);
-  const preGlobalFilteredRows = rows || [];
-  const [globalFilter, setGlobalFilter] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [setPage] = useState(0);
   const [setPageSize] = useState(10);
-  const [ownRequestRows] = useState(ownRequestData);
+  const [ownRequestRows, setOwnRequestRows] = useState([]);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [isPendingViewOpen, setIsPendingViewOpen] = useState(false);
   const [isExistingViewOpen, setIsExistingViewOpen] = useState(false);
@@ -94,12 +38,16 @@ const AddExistingPendingWorkflow = () => {
     setIsDialogOpen(false);
   };
 
-  const [isDetailViewOpen, setIsDetailViewOpen] = useState(false);
-
-  const handleOpenDetailView = (rowData) => {
-    setSelectedRowData(rowData);
-    setIsDetailViewOpen(true);
+  const closeExistingView = () => {
+    setIsExistingViewOpen(false);
   };
+
+  //const [isDetailViewOpen, setIsDetailViewOpen] = useState(false);
+
+  // const handleOpenDetailView = (rowData) => {
+  //   setSelectedRowData(rowData);
+  //   setIsDetailViewOpen(true);
+  // };
 
   const columns = [
     { field: 'type', headerName: 'Workflow Type', flex: 1 },
@@ -107,6 +55,7 @@ const AddExistingPendingWorkflow = () => {
     { field: 'minAmount', headerName: 'Minimum Amount', flex: 1 },
     { field: 'maxAmount', headerName: 'Maximum Amount', flex: 1 },
     { field: 'status', headerName: 'Workflow Status', flex: 1 },
+    { field: 'workflowSelectionId', headerName: 'workflowSelectionId', flex: 1 },
     { field: 'approvalStatus', headerName: 'Approval Status', flex: 1 },
     {
       renderCell: (params) => {
@@ -188,8 +137,10 @@ const AddExistingPendingWorkflow = () => {
     { field: 'account', headerName: 'Account Number', flex: 1 },
     { field: 'minAmount', headerName: 'Minimum Amount', flex: 1 },
     { field: 'maxAmount', headerName: 'Maximum Amount', flex: 1 },
+    { field: 'workflowSelectionId', headerName: 'workflowSelectionId', flex: 1 },
     { field: 'action', headerName: 'Action', flex: 1 },
     { field: 'reqCreateDate', headerName: 'Request Created Date', flex: 1 },
+
     { field: 'approvalStatus', headerName: 'Approval Status', flex: 1 },
     {
       renderCell: (params) => {
@@ -199,7 +150,8 @@ const AddExistingPendingWorkflow = () => {
               <IconButton
                 color="error"
                 onClick={(e) => {
-                  handleOpenDetailView(params.row);
+                  setSelectedRowData(params.row);
+                  setIsExistingViewOpen(true);
                   e.stopPropagation();
                 }}
               >
@@ -245,38 +197,73 @@ const AddExistingPendingWorkflow = () => {
 
   const [loading] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://10.30.2.111:9081/workflow2/v3/v4/existing/client', {
-        headers: {
-          adminUserId: 'nable'
-        },
-        params: {
-          companyID: 'nable',
-          direction: 'ASC',
-          page: 2,
-          per_page: 50,
-          sort: 'workflowSelectionId'
-        }
-      });
-      const fetchedData = response.data.result;
-      console.log(response);
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await axios.get('http://10.30.2.111:9081/workflow2/v3/v4/existing/client', {
+  //       headers: {
+  //         adminUserId: 'nable'
+  //       },
+  //       params: {
+  //         companyID: 'nable',
+  //         direction: 'ASC',
+  //         page: 3,
+  //         per_page: 50,
+  //         sort: 'workflowSelectionId'
+  //       }
+  //     });
+  //     const fetchedData = response.data.result;
+  //     console.log(response);
 
-      const transformedData = fetchedData.map((item) => ({
-        type: item.type,
-        account: item.account,
-        minAmount: item.minAmount,
-        maxAmount: item.maxAmount,
-        status: item.status,
-        approvalStatus: item.approvalStatus,
-        id: id
-      }));
+  //     const transformedData = fetchedData.map((item) => ({
+  //       type: item.type,
+  //       account: item.account,
+  //       minAmount: item.minAmount,
+  //       maxAmount: item.maxAmount,
+  //       status: item.status,
+  //       approvalStatus: item.approvalStatus,
+  //       workflowOptionId: item.workFlowOptions[0]?.workflowOptionId || '',
+  //       id: item.workflowSelectionId
+  //     }));
+  //     console.log('Transformed Data:', transformedData);
+  //     setRows(transformedData.reverse());
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
 
-      setRows(transformedData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  // const fetchOwnRequestData = async () => {
+  //   try {
+  //     const response = await axios.get('http://10.30.2.111:9081/workflow2/v3/v4/existing/client', {
+  //       headers: {
+  //         adminUserId: 'nable'
+  //       },
+  //       params: {
+  //         companyID: 'nable',
+  //         direction: 'ASC',
+  //         page: 3,
+  //         per_page: 50,
+  //         sort: 'workflowSelectionId'
+  //       }
+  //     });
+
+  //     const ownRequestData = response.data.result.map((item) => ({
+  //       companyId: item.companyId,
+  //       type: item.type,
+  //       account: item.account,
+  //       minAmount: item.minAmount,
+  //       maxAmount: item.maxAmount,
+  //       action: item.action,
+  //       reqCreateDate: item.currentRequestDate,
+  //       approvalStatus: item.approvalStatus,
+  //       workflowOptionId: item.workFlowOptions[0]?.workflowOptionId || '',
+  //       id: item.workflowSelectionId
+  //     }));
+
+  //     setOwnRequestRows(ownRequestData.reverse());
+  //   } catch (error) {
+  //     console.error('Error fetching own request data:', error);
+  //   }
+  // };
 
   // const fetchData = async (queryParams = {}) => {
   //   try {
@@ -360,7 +347,55 @@ const AddExistingPendingWorkflow = () => {
   // };
 
   useEffect(() => {
-    fetchData();
+    const fetchDataAndOwnRequest = async () => {
+      try {
+        const response = await axios.get('http://10.30.2.111:9081/workflow2/v3/v4/existing/client', {
+          headers: {
+            adminUserId: 'nable'
+          },
+          params: {
+            companyID: 'nable',
+            direction: 'ASC',
+            page: 3,
+            per_page: 50,
+            sort: 'workflowSelectionId'
+          }
+        });
+        const fetchedData = response.data.result;
+
+        const transformedData = fetchedData.map((item) => ({
+          type: item.type,
+          account: item.account,
+          minAmount: item.minAmount,
+          maxAmount: item.maxAmount,
+          status: item.status,
+          approvalStatus: item.approvalStatus,
+          workflowSelectionId: item.workflowSelectionId,
+          id: item.workflowId
+        }));
+
+        setRows(transformedData.reverse());
+
+        const ownRequestData = fetchedData.map((item) => ({
+          companyId: item.companyId,
+          type: item.type,
+          account: item.account,
+          minAmount: item.minAmount,
+          maxAmount: item.maxAmount,
+          action: item.action,
+          reqCreateDate: item.currentRequestDate,
+          approvalStatus: item.approvalStatus,
+          workflowSelectionId: item.workflowSelectionId,
+          id: item.workflowId
+        }));
+
+        setOwnRequestRows(ownRequestData.reverse());
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchDataAndOwnRequest();
   }, []);
 
   return (
@@ -368,14 +403,13 @@ const AddExistingPendingWorkflow = () => {
       <Grid container spacing={2}>
         <Grid item md={12}>
           <MainCard>
-            <Stack direction="row" spacing={2} justifyContent="space-between">
-              <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={1}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Button
                   variant="contained"
                   startIcon={<PlusOutlined />}
                   onClick={handleOpenDialog}
-                  style={{ backgroundColor: '#8BC34A', color: 'white' }}
+                  style={{ backgroundColor: '#2979ff', color: 'white' }}
                 >
                   Add New Workflow
                 </Button>
@@ -505,35 +539,20 @@ const AddExistingPendingWorkflow = () => {
 
       {isExistingViewOpen == true && (
         <Dialog
-          //maxWidth="sm"
-          fullWidth={fullWidth}
-          maxWidth={maxWidth}
+          //fullWidth={fullWidth}
+          //maxWidth="md"
+          fullScreen
+          // fullWidth={fullWidth}
+          // maxWidth={maxWidth}
           TransitionComponent={Slide}
           keepMounted
-          //fullWidth
-          onClose={() => setIsExistingViewOpen(false)}
+          //onClose={() => setIsExistingViewOpen(false)}
+          onClose={closeExistingView}
           open={isExistingViewOpen}
           sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
           aria-describedby="alert-dialog-slide-description"
         >
-          <ExistingView rowData={selectedRowData} />
-        </Dialog>
-      )}
-
-      {isDetailViewOpen && (
-        <Dialog
-          //maxWidth="sm"
-          fullWidth={fullWidth}
-          maxWidth={maxWidth}
-          TransitionComponent={Slide}
-          keepMounted
-          //fullWidth
-          onClose={() => setIsDetailViewOpen(false)}
-          open={isDetailViewOpen}
-          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <OwnRequestDetailView rowData={selectedRowData} />
+          <ExistingView workflowSelectionId={selectedRowData.workflowSelectionId} onClose={closeExistingView} />
         </Dialog>
       )}
     </>
