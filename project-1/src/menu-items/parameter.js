@@ -1,5 +1,6 @@
 // assets
 import { BankOutlined, HourglassOutlined, SwapOutlined, AlertOutlined } from '@ant-design/icons';
+
 // icons
 const icons = { BankOutlined, HourglassOutlined, SwapOutlined, AlertOutlined };
 
@@ -10,13 +11,13 @@ const parameter = {
   title: 'Parameter',
   type: 'group',
   children: [
-    {
-      id: 'currency',
-      title: 'Currency Crud Samples',
-      type: 'item',
-      url: '/parameter/currency-page',
-      icon: icons.BankOutlined
-    },
+    // {
+    //   id: 'currency',
+    //   title: 'Currency Crud Samples',
+    //   type: 'item',
+    //   url: '/parameter/currency-page',
+    //   icon: icons.BankOutlined
+    // },
 
     {
       id: 'workflow',
@@ -25,28 +26,35 @@ const parameter = {
       url: '/parameter/get-existing-pending-workflow',
       icon: icons.SwapOutlined
     },
+    // {
+    //   id: 'paginationtest',
+    //   title: 'Pagination API Test',
+    //   type: 'item',
+    //   url: '/parameter/get-pagiantion-api-test',
+    //   icon: icons.AlertOutlined
+    // },
     {
-      id: 'paginationtest',
-      title: 'Pagination API Test',
+      id: 'fundtransfer',
+      title: 'Fund Transfer',
       type: 'item',
-      url: '/parameter/get-pagiantion-api-test',
-      icon: icons.AlertOutlined
-    },
-
-    {
-      id: 'usergroups',
-      title: 'Existing Groups',
-      type: 'item',
-      url: '/parameter/get-user-groups',
-      icon: icons.SwapOutlined
-    },
-    {
-      id: 'branches',
-      title: 'Branches',
-      type: 'item',
-      url: '/parameter/get-branches',
-      icon: icons.AlertOutlined
+      url: '/parameter/get-fund-transfer',
+      icon: icons.HourglassOutlined
     }
+
+    // {
+    //   id: 'usergroups',
+    //   title: 'Existing Groups',
+    //   type: 'item',
+    //   url: '/parameter/get-user-groups',
+    //   icon: icons.SwapOutlined
+    // },
+    // {
+    //   id: 'branches',
+    //   title: 'Branches',
+    //   type: 'item',
+    //   url: '/parameter/get-branches',
+    //   icon: icons.AlertOutlined
+    // }
   ]
 };
 

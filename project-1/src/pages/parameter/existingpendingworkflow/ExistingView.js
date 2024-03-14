@@ -4,15 +4,9 @@ import axios from 'axios';
 import Button from '@mui/material/Button';
 
 const ApproverDetailsTable = ({ workflowSelectionId, onClose }) => {
-  const [rows, setRows] = useState([]);
+  const [workflowDetails, setWorkflowDetails] = useState({});
   const [loading, setLoading] = useState(true);
-
-  const [existingDetailsRows, setExistingDetailsRows] = useState([]);
-  const [existingDetailsLoading, setExistingDetailsLoading] = useState(true);
-
-  const handleClose = () => {
-    onClose();
-  };
+  const [rows, setRows] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,6 +19,15 @@ const ApproverDetailsTable = ({ workflowSelectionId, onClose }) => {
         const approvedData = response.data;
 
         if (approvedData) {
+          setWorkflowDetails({
+            workflowType: approvedData.type,
+            account: approvedData.account,
+            minAmount: approvedData.minAmount,
+            maxAmount: approvedData.maxAmount,
+            status: approvedData.status,
+            approvalStatus: approvedData.approvalStatus
+          });
+
           const transformedData = approvedData.workFlowOptions.flatMap((workFlowOption) => {
             const workFlowLevels = workFlowOption?.workFlowLevels || [];
 
@@ -34,50 +37,30 @@ const ApproverDetailsTable = ({ workflowSelectionId, onClose }) => {
               level: item.level || '',
               gravity: item.gravity || '',
               groupName: item.groupName || '',
-              //createdBy: approvedData.createdBy,
               approvalStatus: approvedData.approvalStatus
             }));
           });
 
           setRows(transformedData);
-
-          const existingDetails = {
-            //id: `${workflowOptionId}_0`,
-            id: approvedData.workflowId,
-            workflowType: approvedData.type,
-            account: approvedData.account,
-            minAmount: approvedData.minAmount,
-            maxAmount: approvedData.maxAmount,
-            status: approvedData.status,
-            approvalStatus: approvedData.approvalStatus
-          };
-
-          setExistingDetailsRows([existingDetails]);
         } else {
+          setWorkflowDetails({});
           setRows([]);
-          setExistingDetailsRows([]);
         }
 
         setLoading(false);
-        setExistingDetailsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
-        setExistingDetailsLoading(false);
       }
     };
 
     fetchData();
   }, [workflowSelectionId]);
 
-  // const columns = [
-  //   { field: 'option', headerName: 'Option', flex: 1 },
-  //   { field: 'level', headerName: 'Level', flex: 1 },
-  //   { field: 'groupName', headerName: 'Group ID', flex: 1 },
-  //   { field: 'gravity', headerName: 'No of Authorizers', flex: 1 },
-  //   //{ field: 'createdBy', headerName: 'User Name', flex: 1 },
-  //   { field: 'approvalStatus', headerName: 'Status', flex: 1 }
-  // ];
+  const handleClose = () => {
+    onClose();
+  };
+
   const columns = [
     { field: 'option', headerName: 'Option', flex: 1, headerClassName: 'table-header' },
     { field: 'level', headerName: 'Level', flex: 1, headerClassName: 'table-header' },
@@ -86,39 +69,51 @@ const ApproverDetailsTable = ({ workflowSelectionId, onClose }) => {
     { field: 'approvalStatus', headerName: 'Status', flex: 1, headerClassName: 'table-header' }
   ];
 
-  const existingDetailsColumns = [
-    { field: 'workflowType', headerName: 'Workflow Type', flex: 1, headerClassName: 'table-header' },
-    { field: 'account', headerName: 'Account', flex: 1, headerClassName: 'table-header' },
-    { field: 'minAmount', headerName: 'Minimum Amount', flex: 1, headerClassName: 'table-header' },
-    { field: 'maxAmount', headerName: 'Maximum Amount', flex: 1, headerClassName: 'table-header' },
-    { field: 'status', headerName: 'Status', flex: 1, headerClassName: 'table-header' },
-    { field: 'approvalStatus', headerName: 'Approval Status', flex: 1, headerClassName: 'table-header' }
-  ];
-
   return (
     <div style={{ textAlign: 'left', padding: '16px' }}>
       <h2>Workflow Details</h2>
 
-      {existingDetailsLoading ? (
-        <p>Loading Existing Details...</p>
-      ) : (
-        <DataGrid rows={existingDetailsRows} columns={existingDetailsColumns} autoHeight autoWidth pageSize={1} />
-      )}
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          sortModel={[
-            { field: 'option', sort: 'asc' },
-            { field: 'level', sort: 'asc' }
-          ]}
-          autoHeight
-          autoWidth
-          pageSize={5}
-        />
-      )}
+      <div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            <div>
+              <strong>Workflow Type:</strong> {workflowDetails.workflowType}
+            </div>
+            <div>
+              <strong>Account:</strong> {workflowDetails.account}
+            </div>
+            <div>
+              <strong>Minimum Amount:</strong> {workflowDetails.minAmount}
+            </div>
+            <div>
+              <strong>Maximum Amount:</strong> {workflowDetails.maxAmount}
+            </div>
+            <div>
+              <strong>Status:</strong> {workflowDetails.status}
+            </div>
+            <div>
+              <strong>Approval Status:</strong> {workflowDetails.approvalStatus}
+            </div>
+          </>
+        )}
+      </div>
+
+      <h3>Workflow Options</h3>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        sortModel={[
+          { field: 'option', sort: 'asc' },
+          { field: 'level', sort: 'asc' }
+        ]}
+        autoHeight
+        autoWidth
+        pageSize={5}
+        hideFooterPagination={true}
+      />
+
       <Button
         color="error"
         onClick={handleClose}
@@ -137,7 +132,6 @@ const ApproverDetailsTable = ({ workflowSelectionId, onClose }) => {
           .table-header {
             background-color: #e0e0e0; 
           }
-          
         `}
       </style>
     </div>

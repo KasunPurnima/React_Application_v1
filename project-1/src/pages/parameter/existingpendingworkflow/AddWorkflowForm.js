@@ -28,11 +28,10 @@ import axios from 'axios';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Autocomplete from '@mui/material/Autocomplete';
-//import Swal from 'sweetalert2';
 
 const getInitialValues = () => {
   return {
-    companyId: 'nable',
+    companyId: localStorage.getItem('companyId'),
     workflowType: '',
     debitAccount: '',
     minimumAmount: '',
@@ -45,9 +44,13 @@ const AddForm = ({ onClose, onSubmit }) => {
   const [succesMessage, setSuccesMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [workflowType, setWorkflowType] = useState('');
-  //const [setAuthorizerOptionsData] = useState([]);
+  const [companyId, setCompanyId] = useState('');
 
-  // const history = useHistory();
+  useEffect(() => {
+    const companyIdFromLocalStorage = localStorage.getItem('companyId');
+    setCompanyId(companyIdFromLocalStorage);
+  }, []);
+
   const handleSnackbarClose = () => {
     setSuccesMessage(null);
     setErrorMessage(null);
@@ -55,36 +58,16 @@ const AddForm = ({ onClose, onSubmit }) => {
   const handleClose = () => {
     onClose();
   };
-  // const handleClose = () => {
-  //   setSuccesMessage(null);
-  //   setErrorMessage(null);
-  // };
-
-  // const handleSuccess = () => {
-  //   setSuccesMessage('Workflow created successfully');
-  //   setErrorMessage(null);
-
-  //   const userConfirmed = window.confirm('Workflow created successfully. Do you want to proceed to the next page?');
-
-  //   if (userConfirmed) {
-  //     history.push('/AddExistingPendingWorkflow');
-  //   }
-  // };
-
-  // const authorizationLevelMapping = {
-  //   'Sequential With Next Level': 'S',
-  //   'Parallel With Next Level': 'P'
-  // };
 
   const formik = useFormik({
     initialValues: getInitialValues(),
-    //validationSchema: UserSchema,
+
     onSubmit: async (values) => {
       console.log('onSubmit called with values:', values);
       try {
         const workFlowSelectionDTO = {
           account: values.debitAccount,
-          companyId: 'nable',
+          companyId: localStorage.getItem('companyId'),
           maxAmount: parseFloat(values.maximumAmount),
           minAmount: parseFloat(values.minimumAmount),
           type: values.workflowType,
@@ -100,7 +83,6 @@ const AddForm = ({ onClose, onSubmit }) => {
           }))
         };
 
-        console.log('Before API call');
         const response = await axios.post('http://10.30.2.111:9081/workflow2/v3/workflow/create/client', workFlowSelectionDTO, {
           headers: {
             adminBranchOrCustomerCompany: 'nable',
@@ -111,15 +93,6 @@ const AddForm = ({ onClose, onSubmit }) => {
         });
 
         if (response.data.statusCodeValue === 202) {
-          // Swal.fire({
-          //   title: 'Workflow Successfully Added!',
-          //   icon: 'success',
-          //   confirmButtonText: 'OK'
-          // }).then(() => {
-          //   window.location.reload();
-          // });
-
-          //handleSuccess();
           setSuccesMessage('Workflow created successfully');
           setErrorMessage(null);
           if (typeof onSubmit === 'function') {
@@ -143,16 +116,6 @@ const AddForm = ({ onClose, onSubmit }) => {
   const [successMessage] = useState();
 
   useEffect(() => {
-    // const fetchAuthorizerOptions = async () => {
-    //   try {
-    //     const response = await axios.get('your_authorizer_options_api_endpoint');
-    //     setAuthorizerOptionsData(response.data);
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // };
-    //fetchAuthorizerOptions();
-
     const fetchGroups = async () => {
       try {
         const response = await axios.get('http://10.30.2.111:9081/workflow2/v3/groups/existing/client', {
@@ -205,29 +168,16 @@ const AddForm = ({ onClose, onSubmit }) => {
     setWorkflowLevels(newWorkflowLevels);
   };
 
-  // const handleAuthorizationLevelChange = (e, optionIndex, levelIndex, newValue) => {
-  //   const newWorkflowLevels = [...workflowLevels];
-  //   newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = authorizationLevelMapping[newValue] || '';
-  //   setWorkflowLevels(newWorkflowLevels);
-  // };
-
-  // const handleAuthorizationLevelChange = (e, optionIndex, levelIndex, newValue) => {
-  //   const newWorkflowLevels = [...workflowLevels];
-  //   newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = newValue || '';
-  //   setWorkflowLevels(newWorkflowLevels);
-  // };
-
   const handleAuthorizationLevelChange = (e, optionIndex, levelIndex, newValue) => {
     const newWorkflowLevels = [...workflowLevels];
     newWorkflowLevels[optionIndex].levels[levelIndex].authorizationLevel = newValue || '';
 
-    // Map the dropdown value to "S" or "P"
     if (newValue === 'Sequential With Next Level') {
       newWorkflowLevels[optionIndex].levels[levelIndex].explan = 'S';
     } else if (newValue === 'Parallel With Next Level') {
       newWorkflowLevels[optionIndex].levels[levelIndex].explan = 'P';
     } else {
-      newWorkflowLevels[optionIndex].levels[levelIndex].explan = ''; // Handle other cases if needed
+      newWorkflowLevels[optionIndex].levels[levelIndex].explan = '';
     }
 
     setWorkflowLevels(newWorkflowLevels);
@@ -258,7 +208,7 @@ const AddForm = ({ onClose, onSubmit }) => {
                   <Grid item xs={6}>
                     <Stack spacing={1.25}>
                       <Typography sx={{ color: 'black', fontWeight: 'bold' }}>Company ID</Typography>
-                      <Typography>nable</Typography>
+                      <Typography>{companyId}</Typography>
                     </Stack>
                   </Grid>
                 </Grid>
@@ -306,13 +256,13 @@ const AddForm = ({ onClose, onSubmit }) => {
                         error={Boolean(touched.debitAccount && errors.debitAccount)}
                         sx={{ width: '80%' }}
                       >
-                        <MenuItem value="account01">001910016519</MenuItem>
-                        <MenuItem value="account02">022210000066</MenuItem>
+                        <MenuItem value="001910016519">001910016519</MenuItem>
+                        <MenuItem value="022210000066">022210000066</MenuItem>
                         <MenuItem value="106257485695">106257485695</MenuItem>
-                        <MenuItem value="account04">009210007900</MenuItem>
-                        <MenuItem value="account05">100250022772</MenuItem>
-                        <MenuItem value="account06">000150180503</MenuItem>
-                        <MenuItem value="account07">106257485692</MenuItem>
+                        <MenuItem value="009210007900">009210007900</MenuItem>
+                        <MenuItem value="100250022772">100250022772</MenuItem>
+                        <MenuItem value="000150180503">000150180503</MenuItem>
+                        <MenuItem value="106257485692">106257485692</MenuItem>
                       </Select>
                     </Stack>
                   </Grid>
@@ -324,9 +274,11 @@ const AddForm = ({ onClose, onSubmit }) => {
                       <TextField
                         fullWidth
                         id="minimumAmount"
-                        type="number"
+                        type="text"
                         placeholder="Enter Minimum Amount"
                         {...getFieldProps('minimumAmount')}
+                        value={formik.values.minimumAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        onChange={(e) => formik.setFieldValue('minimumAmount', e.target.value.replace(/,/g, ''))}
                         error={Boolean(touched.minimumAmount && errors.minimumAmount)}
                         sx={{ width: '90%' }}
                         helperText={touched.minimumAmount && errors.minimumAmount}
@@ -341,9 +293,11 @@ const AddForm = ({ onClose, onSubmit }) => {
                       <TextField
                         fullWidth
                         id="maximumAmount"
-                        type="number"
+                        type="text"
                         placeholder="Enter Maximum Amount"
                         {...getFieldProps('maximumAmount')}
+                        value={formik.values.maximumAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        onChange={(e) => formik.setFieldValue('maximumAmount', e.target.value.replace(/,/g, ''))}
                         error={Boolean(touched.maximumAmount && errors.maximumAmount)}
                         sx={{ width: '90%' }}
                         helperText={touched.maximumAmount && errors.maximumAmount}
@@ -372,11 +326,11 @@ const AddForm = ({ onClose, onSubmit }) => {
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell>Option Number</TableCell>
-                            <TableCell>Level</TableCell>
-                            <TableCell>Group</TableCell>
-                            <TableCell>No of Authorizers</TableCell>
-                            <TableCell>Sequential/Parallel</TableCell>
+                            <TableCell sx={{ backgroundColor: '#e0e0e0' }}>Option Number</TableCell>
+                            <TableCell sx={{ backgroundColor: '#e0e0e0' }}>Level</TableCell>
+                            <TableCell sx={{ backgroundColor: '#e0e0e0' }}>Group</TableCell>
+                            <TableCell sx={{ backgroundColor: '#e0e0e0' }}>No of Authorizers</TableCell>
+                            <TableCell sx={{ backgroundColor: '#e0e0e0' }}>Authorization Level</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -424,14 +378,6 @@ const AddForm = ({ onClose, onSubmit }) => {
                               </TableCell>
 
                               <TableCell>
-                                {/* <Autocomplete
-                                  options={['Sequential With Next Level', 'Parallel With Next Level']}
-                                  value={level.authorizationLevel}
-                                  onChange={(e, newValue) => handleAuthorizationLevelChange(e, optionIndex, index, newValue)}
-                                  renderInput={(params) => <TextField {...params} label="Please Select Level" />}
-                                  style={{ width: '250px', maxHeight: '100px', overflow: 'auto' }}
-                                  disableClearable
-                                /> */}
                                 <Autocomplete
                                   options={['Sequential With Next Level', 'Parallel With Next Level']}
                                   value={level.authorizationLevel}

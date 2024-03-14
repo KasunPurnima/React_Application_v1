@@ -48,7 +48,7 @@ const AddNewBranch = ({ onCancel, addUser }) => {
                       <TextField
                         fullWidth
                         id="companyId"
-                        placeholder="Enter Company ID"
+                        //placeholder="Enter Company ID"
                         {...getFieldProps('companyId')}
                         error={Boolean(touched.companyId && errors.companyId)}
                         helperText={touched.companyId && errors.companyId}
